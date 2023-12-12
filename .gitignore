@@ -1,0 +1,5 @@
+.docker/data/
+frontend/
+ssl/
+.env
+.wwebjs_auth

@@ -4,28 +4,28 @@ networks:
   whaticket:
 
 services:
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: ./Dockerfile
-  #   environment:
-  #     - DB_HOST=mysql
-  #     - DB_USER=root
-  #     - DB_PASS=${MYSQL_ROOT_PASSWORD:-strongpassword}
-  #     - DB_NAME=${MYSQL_DATABASE:-whaticket}
-  #     - JWT_SECRET=${JWT_SECRET:-3123123213123}
-  #     - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
-  #     - BACKEND_URL=${BACKEND_URL:-http://localhost}
-  #     - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
-  #     - PROXY_PORT=${PROXY_PORT:-8080}
-  #     - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
-  #   ports:
-  #     - ${BACKEND_PORT:-8080}:3000
-  #   volumes:
-  #     - ./backend/public/:/usr/src/app/public/
-  #     - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
-  #   networks:
-  #     - whaticket
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASS=${MYSQL_ROOT_PASSWORD:-strongpassword}
+      - DB_NAME=${MYSQL_DATABASE:-whaticket}
+      - JWT_SECRET=${JWT_SECRET:-3123123213123}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-75756756756}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - PROXY_PORT=${PROXY_PORT:-8080}
+      - CHROME_ARGS=--no-sandbox --disable-setuid-sandbox
+    ports:
+      - ${BACKEND_PORT:-8080}:3000
+    volumes:
+      - ./backend/public/:/usr/src/app/public/
+      - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
+    networks:
+      - whaticket
 
   frontend:
     ports:

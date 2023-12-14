@@ -1,4 +1,4 @@
-FROM node:14 as build-deps
+FROM node:18 as build-deps
 
 RUN apt-get update && apt-get install -y wget
 
@@ -25,14 +25,14 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN yarn install
 
-COPY . .
+COPY . /usr/src/app
 RUN yarn run build
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3333
 ENV CHROME_BIN=google-chrome-stable
 
-EXPOSE 3000
+EXPOSE 3333
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD dockerize -wait tcp://${DB_HOST}:3306 \

@@ -1,6 +1,6 @@
 FROM node:18
 
-ENV PORT 3000
+ENV PORT 80
 
 # Cria o app diretorio
 RUN mkdir -p /usr/src/app
@@ -15,7 +15,7 @@ COPY . /usr/src/app
 
 # Building app
 RUN yarn run build
-EXPOSE 3000
+EXPOSE 80
 
 # Running the app
 CMD "yarn" "run" "dev"

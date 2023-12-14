@@ -1,14 +1,15 @@
-import { Server as SocketIO } from "socket.io";
 import { Server } from "http";
+import { Server as SocketIO } from "socket.io";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
 
 let io: SocketIO;
 
 export const initIO = (httpServer: Server): SocketIO => {
+  const frontEnd = process.env.FRONTEND_URL?.split(",");
   io = new SocketIO(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL
+      origin: frontEnd
     }
   });
 

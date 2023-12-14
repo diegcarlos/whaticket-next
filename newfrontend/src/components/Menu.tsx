@@ -108,7 +108,7 @@ const Drawer = styled(MuiDrawer, {
 const LINKS = [
   { text: "Dashboard", href: "/", icon: DashboardIcon },
   { text: "Conexões", href: "/connections", icon: SyncAltIcon },
-  { text: "Tickets", href: "/tickets", icon: WhatsAppIcon },
+  { text: "Tickets", href: "/tickets/0", icon: WhatsAppIcon },
   { text: "Contatos", href: "/contacts", icon: ContactPhoneIcon },
   {
     text: "Respostas rápidas",
@@ -132,7 +132,7 @@ export default function Menu(props: Props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
-  const { user, handleLogout } = useAccess();
+  const { handleLogout } = useAccess();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -219,7 +219,7 @@ export default function Menu(props: Props) {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <DrawerHeader />
         {children}
       </Box>

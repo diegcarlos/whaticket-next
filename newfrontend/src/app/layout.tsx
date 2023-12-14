@@ -3,6 +3,7 @@ import * as React from "react";
 import Menu from "@/components/Menu";
 import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
 import { AuthProvider } from "@/context/AuthContext";
+import { WhatsAppsProvider } from "@/context/WhatsApp/WhatsAppsContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -22,7 +23,9 @@ export default function RootLayout(props: Props) {
       <body>
         <ThemeRegistry>
           <AuthProvider>
-            <Menu>{children}</Menu>
+            <WhatsAppsProvider>
+              <Menu>{children}</Menu>
+            </WhatsAppsProvider>
           </AuthProvider>
         </ThemeRegistry>
         <ToastContainer

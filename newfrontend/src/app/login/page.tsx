@@ -1,6 +1,7 @@
 "use client";
 import useAccess from "@/context/AuthContext";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import SyncIcon from "@mui/icons-material/Sync";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -14,11 +15,10 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-
 const defaultTheme = createTheme();
 
 export default function Login() {
-  const { handleLogin } = useAccess();
+  const { handleLogin, loading } = useAccess();
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -80,12 +80,29 @@ export default function Login() {
                 label="Lembrar"
               />
               <Button
+                disabled={loading}
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Acessar
+                {loading ? (
+                  <SyncIcon
+                    sx={{
+                      animation: "spin 2s linear infinite",
+                      "@keyframes spin": {
+                        "0%": {
+                          transform: "rotate(360deg)",
+                        },
+                        "100%": {
+                          transform: "rotate(0deg)",
+                        },
+                      },
+                    }}
+                  />
+                ) : (
+                  "Acessar"
+                )}
               </Button>
               <Grid container>
                 <Grid item xs>

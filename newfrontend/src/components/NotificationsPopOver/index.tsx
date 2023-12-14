@@ -4,16 +4,16 @@ import { format } from "date-fns";
 import useSound from "use-sound";
 import openSocket from "../../services/socket-io";
 
-import Badge from "@material-ui/core/Badge";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Popover from "@material-ui/core/Popover";
-import { makeStyles } from "@material-ui/core/styles";
-import ChatIcon from "@material-ui/icons/Chat";
-
 import useAccess from "@/context/AuthContext";
+import {
+  Badge,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Popover,
+  makeStyles,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import alertSound from "../../assets/sound.mp3";
 import useTickets from "../../hooks/useTickets";

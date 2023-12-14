@@ -33,7 +33,7 @@ interface PropsContextAuth {
   handleLogout: () => Promise<void>;
 }
 
-const AuthContext = createContext({} as PropsContextAuth);
+const AuthContext = createContext<PropsContextAuth>({} as PropsContextAuth);
 
 function AuthProvider(props: PropsAuthProvider) {
   const { children } = props;

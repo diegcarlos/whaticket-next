@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 
 import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
@@ -6,9 +6,9 @@ import * as Yup from "yup";
 
 import { i18n } from "../../translate/i18n";
 
-import { Button } from "@mui/base";
 import { Colorize } from "@mui/icons-material";
 import {
+  Button,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -17,19 +17,17 @@ import {
   IconButton,
   InputAdornment,
   TextField,
-  makeStyles,
 } from "@mui/material";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ColorPicker from "../ColorPicker";
 
-const useStyles = makeStyles((theme) => ({
+const classes: { [v: string]: CSSProperties } = {
   root: {
     display: "flex",
     flexWrap: "wrap",
   },
   textField: {
-    marginRight: theme.spacing(1),
     flex: 1,
   },
 
@@ -46,14 +44,13 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: -12,
   },
   formControl: {
-    margin: theme.spacing(1),
     minWidth: 120,
   },
   colorAdorment: {
     width: 20,
     height: 20,
   },
-}));
+};
 
 const QueueSchema = Yup.object().shape({
   name: Yup.string()
@@ -72,7 +69,6 @@ interface Props {
 
 function QueueModal(props: Props) {
   const { open, onClose, queueId } = props;
-  const classes = useStyles();
 
   const initialState = {
     name: "",
@@ -82,7 +78,7 @@ function QueueModal(props: Props) {
 
   const [colorPickerModalOpen, setColorPickerModalOpen] = useState(false);
   const [queue, setQueue] = useState(initialState);
-  const greetingRef = useRef();
+  const greetingRef = useRef<any>();
 
   useEffect(() => {
     (async () => {
@@ -111,7 +107,7 @@ function QueueModal(props: Props) {
     setQueue(initialState);
   };
 
-  const handleSaveQueue = async (values) => {
+  const handleSaveQueue = async (values: any) => {
     try {
       if (queueId) {
         await api.put(`/queue/${queueId}`, values);
@@ -126,7 +122,7 @@ function QueueModal(props: Props) {
   };
 
   return (
-    <div className={classes.root}>
+    <div style={classes.root}>
       <Dialog open={open} onClose={handleClose} scroll="paper">
         <DialogTitle>
           {queueId
@@ -173,8 +169,10 @@ function QueueModal(props: Props) {
                     startAdornment: (
                       <InputAdornment position="start">
                         <div
-                          style={{ backgroundColor: values.color }}
-                          className={classes.colorAdorment}
+                          style={{
+                            backgroundColor: values.color,
+                            ...classes.colorAdorment,
+                          }}
                         ></div>
                       </InputAdornment>
                     ),
@@ -192,6 +190,7 @@ function QueueModal(props: Props) {
                   margin="dense"
                 />
                 <ColorPicker
+                  currentColor=""
                   open={colorPickerModalOpen}
                   handleClose={() => setColorPickerModalOpen(false)}
                   onChange={(color) => {
@@ -236,16 +235,13 @@ function QueueModal(props: Props) {
                   color="primary"
                   disabled={isSubmitting}
                   variant="contained"
-                  className={classes.btnWrapper}
+                  sx={classes.btnWrapper}
                 >
                   {queueId
                     ? `${i18n.t("queueModal.buttons.okEdit")}`
                     : `${i18n.t("queueModal.buttons.okAdd")}`}
                   {isSubmitting && (
-                    <CircularProgress
-                      size={24}
-                      className={classes.buttonProgress}
-                    />
+                    <CircularProgress size={24} sx={classes.buttonProgress} />
                   )}
                 </Button>
               </DialogActions>

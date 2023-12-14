@@ -1,31 +1,21 @@
-###############
-# build stage #
-###############
+FROM node:18
 
-FROM node:20 AS build
+ENV PORT 3000
 
-WORKDIR /
+# Cria o app diretorio
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-COPY package.json yarn.lock tsconfig.json ./
-
-# installs both production and dev dependencies
+# instala dependencias
+COPY package*.json /usr/src/app/
 RUN yarn install
 
-RUN yarn build
+# Copia as dependencias ara diretorio
+COPY . /usr/src/app
 
-###############
-# final stage #
-###############
+# Building app
+RUN yarn run build
+EXPOSE 3000
 
-FROM node:20
-
-
-COPY package.json yarn.lock ./
-
-# installs only production dependencies
-RUN yarn install
-
-# wherever your tsc build output is
-COPY --from=build ./build ./build
-
-USER node
+# Running the app
+CMD "npm" "run" "dev"

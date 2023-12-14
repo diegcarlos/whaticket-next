@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --noEmit",
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
     "dev:server": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
@@ -56,6 +56,7 @@
     "@types/mustache": "^4.1.2",
     "@types/node": "^14.11.8",
     "@types/pino-pretty": "~4.7.1",
+    "@types/pino-std-serializers": "^4.0.0",
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.3.3",
     "@types/validator": "^13.1.0",

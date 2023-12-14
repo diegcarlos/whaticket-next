@@ -2,26 +2,23 @@
 # build stage #
 ###############
 
-FROM node:16-alpine AS build
+FROM node:20 AS build
 
-ARG NODE_ENV="development"
-
-WORKDIR /app
+WORKDIR /
 
 COPY package.json yarn.lock tsconfig.json ./
 
 # installs both production and dev dependencies
 RUN yarn install
 
-RUN yarn run build
+RUN yarn build
 
 ###############
 # final stage #
 ###############
 
-FROM node:16-alpine
+FROM node:20
 
-ARG NODE_ENV="production"
 
 COPY package.json yarn.lock ./
 
@@ -32,5 +29,3 @@ RUN yarn install
 COPY --from=build ./build ./build
 
 USER node
-
-CMD yarn run start

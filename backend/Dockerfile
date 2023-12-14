@@ -31,11 +31,11 @@ ENV CHROME_BIN=google-chrome-stable
 
 
 COPY . .
+RUN npx sequelize db:migrate
 RUN npm run build
 
 EXPOSE 3333
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD dockerize -wait tcp://${DB_HOST}:3306 \
-  && npx sequelize db:migrate \
   && node dist/server.js

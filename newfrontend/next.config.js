@@ -7,6 +7,7 @@ const nextConfig = {
       transform: "@mui/icons-material/{{member}}",
     },
   },
+  output: "standalone",
   images: {
     remotePatterns: [
       {

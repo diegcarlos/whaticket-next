@@ -1,15 +1,36 @@
-FROM node:14
+###############
+# build stage #
+###############
 
-WORKDIR /usr/src/app
+FROM node:16-alpine AS build
 
-COPY package*.json ./
+ARG NODE_ENV="development"
 
-RUN npm install
+WORKDIR /app
 
-COPY . .
+COPY package.json yarn.lock tsconfig.json ./
 
-RUN npm run build
+# installs both production and dev dependencies
+RUN yarn install
 
-EXPOSE 3000
+RUN yarn run build
 
-CMD ["npm", "start"]
+###############
+# final stage #
+###############
+
+FROM node:16-alpine
+
+ARG NODE_ENV="production"
+
+COPY package.json yarn.lock ./
+
+# installs only production dependencies
+RUN yarn install
+
+# wherever your tsc build output is
+COPY --from=build ./build ./build
+
+USER node
+
+CMD yarn run start

@@ -23,10 +23,10 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN yarn install
+RUN npm install
 
 COPY . .
-RUN yarn run build
+RUN npm run build
 
 ENV NODE_ENV=production
 ENV PORT=3333

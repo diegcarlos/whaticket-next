@@ -21,8 +21,9 @@ RUN chmod +x /usr/local/bin/dumb-init
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY package*.json /usr/src/app
 RUN yarn install
 
 COPY . /usr/src/app

@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
 RUN yarn install
 
-# Copia as dependencias ara diretorio
+# Copia as dependencias para diretorio
 COPY . /usr/src/app
 
 # Building app

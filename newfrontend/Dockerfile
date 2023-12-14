@@ -18,4 +18,4 @@ RUN yarn run build
 EXPOSE 80
 
 # Running the app
-CMD "yarn" "run" "dev"
+CMD "yarn" "run" "start"

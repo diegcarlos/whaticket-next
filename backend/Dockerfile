@@ -25,12 +25,6 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install
-RUN ls
-RUN npx sequelize init
-RUN npx sequelize db:migrate
-RUN npx sequelize db:seed:all
-
 COPY . .
 RUN npm run build
 

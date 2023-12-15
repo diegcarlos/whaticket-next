@@ -123,7 +123,7 @@ const TransferTicketModal = ({
       await api.put(`/tickets/${ticketid}`, data);
 
       setLoading(false);
-      history.push(`/tickets`);
+      history.push(`/tickets/0`);
     } catch (err) {
       setLoading(false);
       toastError(err);

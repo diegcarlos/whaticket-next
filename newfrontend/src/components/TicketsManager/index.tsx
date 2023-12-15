@@ -1,3 +1,4 @@
+"use client";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
 import NewTicketModal from "../NewTicketModal";
@@ -51,6 +52,8 @@ const classes: { [v: string]: CSSProperties } = {
     justifyContent: "space-between",
     alignItems: "center",
     background: "#fafafa",
+    paddingLeft: 2,
+    paddingRight: 2,
   },
 
   serachInputWrapper: {

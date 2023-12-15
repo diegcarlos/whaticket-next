@@ -12,10 +12,10 @@ const classes = {
   },
 };
 
-const TicketHeader = ({ loading, children }: any) => {
+function TicketHeader({ loading, children }: any) {
   const history = useRouter();
   const handleBack = () => {
-    history.push("/tickets");
+    history.push("/tickets/0");
   };
 
   return (
@@ -32,6 +32,6 @@ const TicketHeader = ({ loading, children }: any) => {
       )}
     </>
   );
-};
+}
 
 export default TicketHeader;

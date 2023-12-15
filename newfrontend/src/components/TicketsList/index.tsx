@@ -2,12 +2,12 @@ import { CSSProperties, useEffect, useReducer, useState } from "react";
 import openSocket from "../../services/socket-io";
 
 import TicketListItem from "../TicketListItem";
-import TicketsListSkeleton from "../TicketsListSkeleton";
 
 import useAccess from "@/context/AuthContext";
 import { List, Paper } from "@mui/material";
 import useTickets from "../../hooks/useTickets";
 import { i18n } from "../../translate/i18n";
+import TicketsListSkeleton from "../TicketsListSkeleton";
 
 const classes: { [v: string]: CSSProperties } = {
   ticketsListWrapper: {
@@ -22,13 +22,12 @@ const classes: { [v: string]: CSSProperties } = {
 
   ticketsList: {
     flex: 1,
-    overflowY: "scroll",
     borderTop: "2px solid rgba(0, 0, 0, 0.12)",
-    minHeight: "calc(100vh - 315px)",
   },
 
   ticketsListHeader: {
     color: "rgb(67, 83, 105)",
+
     zIndex: 2,
     backgroundColor: "white",
     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
@@ -266,14 +265,14 @@ function TicketsList(props: any) {
   };
 
   return (
-    <Paper sx={classes.ticketsListWrapper} style={style}>
+    <Paper sx={classes.ticketsListWrapper} style={{ ...style }}>
       <Paper
         square
         elevation={0}
         sx={classes.ticketsList}
         onScroll={handleScroll}
       >
-        <List style={{ paddingTop: 0 }}>
+        <List style={{ padding: 0, height: "65vh", overflow: "auto" }}>
           {ticketsList?.length === 0 && !loading ? (
             <div style={classes.noTicketsDiv}>
               <span style={classes.noTicketsTitle}>
@@ -286,7 +285,9 @@ function TicketsList(props: any) {
           ) : (
             <>
               {ticketsList?.map((ticket) => (
-                <TicketListItem ticket={ticket} key={ticket.id} />
+                <>
+                  <TicketListItem ticket={ticket} key={ticket.id} />
+                </>
               ))}
             </>
           )}

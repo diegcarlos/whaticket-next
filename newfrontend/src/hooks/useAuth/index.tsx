@@ -93,7 +93,7 @@ export default function useAuth() {
       setUser(data.user);
       setIsAuth(true);
       toast.success("Login efetuado com sucesso!");
-      router.push("/tickets");
+      router.push("/tickets/0");
       setLoading(false);
     } catch (err) {
       toastError(err);

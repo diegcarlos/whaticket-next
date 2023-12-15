@@ -40,6 +40,7 @@ const NewTicketModal = ({ modalOpen, onClose }: any) => {
       return;
     }
     setLoading(true);
+
     const delayDebounceFn = setTimeout(() => {
       const fetchContacts = async () => {
         try {

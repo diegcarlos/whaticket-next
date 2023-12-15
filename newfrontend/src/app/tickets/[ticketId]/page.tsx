@@ -11,7 +11,7 @@ const classes: { [v: string]: CSSProperties } = {
     flex: 1,
     // // backgroundColor: "#eee",
     // padding: theme.spacing(4),
-    height: `calc(100vh - 80px)`,
+    height: `100%`,
     overflowY: "hidden",
   },
 
@@ -70,7 +70,7 @@ function Chat({ params }: any) {
           </Grid>
           <Grid item xs={12} md={8} sx={classes.messagessWrapper}>
             {/* <Grid item xs={8} style={classes.messagessWrapper}> */}
-            {ticketId ? (
+            {ticketId > 0 ? (
               <>
                 <Ticket ticketId={ticketId} />
               </>

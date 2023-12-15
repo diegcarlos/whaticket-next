@@ -1,13 +1,14 @@
-import React, {
-  CSSProperties,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 
+import clsx from "clsx";
 import { format, isSameDay, parseISO } from "date-fns";
 import openSocket from "../../services/socket-io";
+
+import LocationPreview from "../LocationPreview";
+import MarkdownWrapper from "../MarkdownWrapper";
+import MessageOptionsMenu from "../MessageOptionsMenu";
+import ModalImageCors from "../ModalImageCors";
+import VcardPreview from "../VcardPreview";
 
 import {
   AccessTime,
@@ -19,18 +20,14 @@ import {
 } from "@mui/icons-material";
 import { Button, CircularProgress, Divider, IconButton } from "@mui/material";
 import { green } from "@mui/material/colors";
+import { makeStyles } from "@mui/styles";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import Audio from "../Audio";
-import LocationPreview from "../LocationPreview";
-import MarkdownWrapper from "../MarkdownWrapper";
-import MessageOptionsMenu from "../MessageOptionsMenu";
-import ModalImageCors from "../ModalImageCors";
-import VcardPreview from "../VcardPreview";
 
 import "./styled.css";
 
-const classes: { [v: string]: CSSProperties } = {
+const useStyles = makeStyles((theme: any) => ({
   messagesListWrapper: {
     overflow: "hidden",
     position: "relative",
@@ -40,12 +37,15 @@ const classes: { [v: string]: CSSProperties } = {
   },
 
   messagesList: {
-    // backgroundImage: `url(${whatsBackground})`,
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
     padding: "20px 20px 20px 20px",
     overflowY: "scroll",
+    [theme.breakpoints?.down("sm")]: {
+      paddingBottom: "90px",
+    },
+    ...theme.scrollbarStyles,
   },
 
   circleLoading: {
@@ -65,6 +65,12 @@ const classes: { [v: string]: CSSProperties } = {
     height: "auto",
     display: "block",
     position: "relative",
+    "&:hover #messageActionsButton": {
+      display: "flex",
+      position: "absolute",
+      top: 0,
+      right: 0,
+    },
 
     whiteSpace: "pre-wrap",
     backgroundColor: "#ffffff",
@@ -113,6 +119,12 @@ const classes: { [v: string]: CSSProperties } = {
     height: "auto",
     display: "block",
     position: "relative",
+    "&:hover #messageActionsButton": {
+      display: "flex",
+      position: "absolute",
+      top: 0,
+      right: 0,
+    },
 
     whiteSpace: "pre-wrap",
     backgroundColor: "#dcf8c6",
@@ -158,6 +170,7 @@ const classes: { [v: string]: CSSProperties } = {
     zIndex: 1,
     backgroundColor: "inherit",
     opacity: "90%",
+    "&:hover, &.Mui-focusVisible": { backgroundColor: "inherit" },
   },
 
   messageContactName: {
@@ -240,7 +253,7 @@ const classes: { [v: string]: CSSProperties } = {
     backgroundColor: "inherit",
     padding: 10,
   },
-};
+}));
 
 const reducer = (state: any, action: any) => {
   if (action.type === "LOAD_MESSAGES") {
@@ -291,6 +304,8 @@ const reducer = (state: any, action: any) => {
 };
 
 const MessagesList = ({ ticketId, isGroup }: any) => {
+  const classes = useStyles();
+
   const [messagesList, dispatch]: any = useReducer(reducer, []);
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -375,7 +390,7 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
     const { scrollTop } = e.currentTarget;
 
     if (scrollTop === 0) {
-      //@ts-ignore
+      // @ts-ignore
       document.getElementById("messagesList").scrollTop = 1;
     }
 
@@ -463,12 +478,16 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
       return <Audio url={message.mediaUrl} />;
     } else if (message.mediaType === "video") {
       return (
-        <video style={classes.messageMedia} src={message.mediaUrl} controls />
+        <video
+          className={classes.messageMedia}
+          src={message.mediaUrl}
+          controls
+        />
       );
     } else {
       return (
         <>
-          <div style={classes.downloadMedia}>
+          <div className={classes.downloadMedia}>
             <Button
               startIcon={<GetApp />}
               color="primary"
@@ -487,24 +506,27 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
 
   const renderMessageAck = (message: any) => {
     if (message.ack === 0) {
-      return <AccessTime fontSize="small" sx={classes.ackIcons} />;
+      return <AccessTime fontSize="small" className={classes.ackIcons} />;
     }
     if (message.ack === 1) {
-      return <Done fontSize="small" sx={classes.ackIcons} />;
+      return <Done fontSize="small" className={classes.ackIcons} />;
     }
     if (message.ack === 2) {
-      return <DoneAll fontSize="small" sx={classes.ackIcons} />;
+      return <DoneAll fontSize="small" className={classes.ackIcons} />;
     }
     if (message.ack === 3 || message.ack === 4) {
-      return <DoneAll fontSize="small" sx={classes.ackDoneAllIcon} />;
+      return <DoneAll fontSize="small" className={classes.ackDoneAllIcon} />;
     }
   };
 
-  const renderDailyTimestamps = (message: any, index: number) => {
+  const renderDailyTimestamps = (message: any, index: any) => {
     if (index === 0) {
       return (
-        <span style={classes.dailyTimestamp} key={`timestamp-${message.id}`}>
-          <div style={classes.dailyTimestampText}>
+        <span
+          className={classes.dailyTimestamp}
+          key={`timestamp-${message.id}`}
+        >
+          <div className={classes.dailyTimestampText}>
             {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
           </div>
         </span>
@@ -516,8 +538,11 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
 
       if (!isSameDay(messageDay, previousMessageDay)) {
         return (
-          <span style={classes.dailyTimestamp} key={`timestamp-${message.id}`}>
-            <div style={classes.dailyTimestampText}>
+          <span
+            className={classes.dailyTimestamp}
+            key={`timestamp-${message.id}`}
+          >
+            <div className={classes.dailyTimestampText}>
               {format(parseISO(messagesList[index].createdAt), "dd/MM/yyyy")}
             </div>
           </span>
@@ -550,11 +575,19 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
 
   const renderQuotedMessage = (message: any) => {
     return (
-      <div style={classes.quotedContainerLeft}>
-        <span style={classes.quotedSideColorLeft}></span>
-        <div style={classes.quotedMsg}>
+      <div
+        className={clsx(classes.quotedContainerLeft, {
+          [classes.quotedContainerRight]: message.fromMe,
+        })}
+      >
+        <span
+          className={clsx(classes.quotedSideColorLeft, {
+            [classes.quotedSideColorRight]: message.quotedMsg?.fromMe,
+          })}
+        ></span>
+        <div className={classes.quotedMsg}>
           {!message.quotedMsg?.fromMe && (
-            <span style={classes.messageContactName}>
+            <span className={classes.messageContactName}>
               {message.quotedMsg?.contact?.name}
             </span>
           )}
@@ -572,18 +605,18 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div style={classes.messageLeft}>
+              <div className={classes.messageLeft}>
                 <IconButton
                   size="small"
                   id="messageActionsButton"
                   disabled={message.isDeleted}
-                  style={classes.messageActionsButton}
+                  className={classes.messageActionsButton}
                   onClick={(e: any) => handleOpenMessageOptionsMenu(e, message)}
                 >
                   <ExpandMore />
                 </IconButton>
                 {isGroup && (
-                  <span style={classes.messageContactName}>
+                  <span className={classes.messageContactName}>
                     {message.contact?.name}
                   </span>
                 )}
@@ -592,10 +625,10 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
                   message.mediaType === "vcard") &&
                   //|| message.mediaType === "multi_vcard"
                   checkMessageMedia(message)}
-                <div style={classes.textContentItem}>
+                <div className={classes.textContentItem}>
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
-                  <span style={classes.timestamp}>
+                  <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
                   </span>
                 </div>
@@ -607,12 +640,12 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div style={classes.messageRight}>
+              <div className={classes.messageRight}>
                 <IconButton
                   size="small"
                   id="messageActionsButton"
                   disabled={message.isDeleted}
-                  style={classes.messageActionsButton}
+                  className={classes.messageActionsButton}
                   onClick={(e: any) => handleOpenMessageOptionsMenu(e, message)}
                 >
                   <ExpandMore />
@@ -622,17 +655,21 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
                   message.mediaType === "vcard") &&
                   //|| message.mediaType === "multi_vcard"
                   checkMessageMedia(message)}
-                <div style={classes.textContentItem}>
+                <div
+                  className={clsx(classes.textContentItem, {
+                    [classes.textContentItemDeleted]: message.isDeleted,
+                  })}
+                >
                   {message.isDeleted && (
                     <Block
                       color="disabled"
                       fontSize="small"
-                      style={classes.deletedIcon}
+                      className={classes.deletedIcon}
                     />
                   )}
                   {message.quotedMsg && renderQuotedMessage(message)}
                   <MarkdownWrapper>{message.body}</MarkdownWrapper>
-                  <span style={classes.timestamp}>
+                  <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
                     {renderMessageAck(message)}
                   </span>
@@ -649,7 +686,7 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
   };
 
   return (
-    <div style={classes.messagesListWrapper}>
+    <div className={`${classes.messagesListWrapper} messages-list`}>
       <MessageOptionsMenu
         message={selectedMessage}
         anchorEl={anchorEl}
@@ -658,15 +695,14 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
       />
       <div
         id="messagesList"
-        // style={classes.messagesList}
-        className="messages-list"
+        className={classes.messagesList}
         onScroll={handleScroll}
       >
         {messagesList.length > 0 ? renderMessages() : []}
       </div>
       {loading && (
         <div>
-          <CircularProgress style={classes.circleLoading} />
+          <CircularProgress className={classes.circleLoading} />
         </div>
       )}
     </div>

@@ -143,7 +143,7 @@ export default function Menu(props: Props) {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", minHeight: "93.2vh", overflow: "hidden" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
@@ -219,7 +219,7 @@ export default function Menu(props: Props) {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box component="main" sx={{ flexGrow: 1, minHeight: "100%" }}>
         <DrawerHeader />
         {children}
       </Box>

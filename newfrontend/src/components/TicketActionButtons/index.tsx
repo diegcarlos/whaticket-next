@@ -45,7 +45,7 @@ function TicketActionButtons({ ticket }: any) {
       if (status === "open") {
         history.push(`/tickets/${ticket.id}`);
       } else {
-        history.push("/tickets");
+        history.push("/tickets/0");
       }
     } catch (err) {
       setLoading(false);

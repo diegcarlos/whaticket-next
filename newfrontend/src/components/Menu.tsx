@@ -108,7 +108,11 @@ const Drawer = styled(MuiDrawer, {
 const LINKS = [
   { text: "Dashboard", href: "/", icon: DashboardIcon },
   { text: "Conexões", href: "/connections", icon: SyncAltIcon },
-  { text: "Tickets", href: "/tickets/0", icon: WhatsAppIcon },
+  {
+    text: "Tickets",
+    href: "/tickets",
+    icon: WhatsAppIcon,
+  },
   { text: "Contatos", href: "/contacts", icon: ContactPhoneIcon },
   {
     text: "Respostas rápidas",
@@ -195,12 +199,14 @@ export default function Menu(props: Props) {
         <List>
           {LINKS.map(({ text, href, icon: Icon }) => (
             <ListItem key={href} disablePadding>
-              <ListItemButton component={Link} href={href}>
-                <ListItemIcon>
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
+              <Link href={href} passHref>
+                <ListItemButton component={Link} href={href}>
+                  <ListItemIcon>
+                    <Icon />
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </Link>
             </ListItem>
           ))}
         </List>

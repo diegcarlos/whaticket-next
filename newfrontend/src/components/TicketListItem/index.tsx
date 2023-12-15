@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 
 import clsx from "clsx";
@@ -156,115 +157,122 @@ const TicketListItem = ({ ticket, ticketId }: any) => {
 
   return (
     <div key={ticket.id}>
-      <ListItemButton
-        LinkComponent={Link}
-        href={`/tickets/${ticket.id}`}
-        dense
-        // onClick={(e: any) => {
-        //   if (ticket.status === "pending") return;
-        //   handleSelectTicket(ticket.id);
-        // }}
-        selected={ticketId && +ticketId === ticket.id}
-        className={clsx(classes.ticket, {
-          [classes.pendingTicket]: ticket.status === "pending",
-        })}
+      <Link href="/tickets/[ticketId]" as={`/tickets/${ticket.id}`}>
+        {ticket.id}
+      </Link>
+      <Link
+        style={{ textDecoration: "none" }}
+        href="/tickets/[ticketId]"
+        as={`/tickets/${ticket.id}`}
       >
-        <Tooltip
-          arrow
-          placement="right"
-          title={ticket.queue?.name || "Sem fila"}
+        <ListItemButton
+          dense
+          // onClick={(e: any) => {
+          //   if (ticket.status === "pending") return;
+          //   handleSelectTicket(ticket.id);
+          // }}
+          selected={ticketId && +ticketId === ticket.id}
+          className={clsx(classes.ticket, {
+            [classes.pendingTicket]: ticket.status === "pending",
+          })}
         >
-          <span
-            style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
-            className={classes.ticketQueueColor}
-          ></span>
-        </Tooltip>
-        <ListItemAvatar>
-          <Avatar src={ticket?.contact?.profilePicUrl} />
-        </ListItemAvatar>
-        <ListItemText
-          disableTypography
-          primary={
-            <span className={classes.contactNameWrapper}>
-              <Typography
-                noWrap
-                component="span"
-                variant="body2"
-                color="textPrimary"
-              >
-                <div style={{ display: "flex", gap: 15, width: "100%" }}>
-                  <span>{ticket.contact.name}</span>
-                  <Badge
-                    className={classes.newMessagesCount}
-                    badgeContent={ticket.unreadMessages}
-                    classes={{
-                      badge: classes.badgeStyle,
-                    }}
-                  />
-                </div>
-              </Typography>
-              {ticket.status === "closed" && (
-                <Badge
-                  className={classes.closedBadge}
-                  badgeContent={"closed"}
-                  color="primary"
-                />
-              )}
-              {ticket.lastMessage && (
+          <Tooltip
+            arrow
+            placement="right"
+            title={ticket.queue?.name || "Sem fila"}
+          >
+            <span
+              style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
+              className={classes.ticketQueueColor}
+            ></span>
+          </Tooltip>
+          <ListItemAvatar>
+            <Avatar src={ticket?.contact?.profilePicUrl} />
+          </ListItemAvatar>
+          <ListItemText
+            disableTypography
+            primary={
+              <span className={classes.contactNameWrapper}>
                 <Typography
-                  className={classes.lastMessageTime}
+                  noWrap
+                  component="span"
+                  variant="body2"
+                  color="textPrimary"
+                >
+                  <div style={{ display: "flex", gap: 15, width: "100%" }}>
+                    <span>{ticket.contact.name}</span>
+                    <Badge
+                      className={classes.newMessagesCount}
+                      badgeContent={ticket.unreadMessages}
+                      classes={{
+                        badge: classes.badgeStyle,
+                      }}
+                    />
+                  </div>
+                </Typography>
+                {ticket.status === "closed" && (
+                  <Badge
+                    className={classes.closedBadge}
+                    badgeContent={"closed"}
+                    color="primary"
+                  />
+                )}
+                {ticket.lastMessage && (
+                  <Typography
+                    className={classes.lastMessageTime}
+                    component="span"
+                    variant="body2"
+                    color="textSecondary"
+                  >
+                    {isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
+                      <>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
+                    ) : (
+                      <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
+                    )}
+                  </Typography>
+                )}
+                {ticket.whatsappId && (
+                  <div
+                    className={classes.userTag}
+                    title={i18n.t("ticketsList.connectionTitle")}
+                  >
+                    {ticket.whatsapp?.name}
+                  </div>
+                )}
+              </span>
+            }
+            secondary={
+              <span className={classes.contactNameWrapper}>
+                <Typography
+                  className={classes.contactLastMessage}
+                  noWrap
                   component="span"
                   variant="body2"
                   color="textSecondary"
                 >
-                  {isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
-                    <>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
+                  {ticket.lastMessage ? (
+                    <MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
                   ) : (
-                    <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
+                    <br />
                   )}
                 </Typography>
-              )}
-              {ticket.whatsappId && (
-                <div
-                  className={classes.userTag}
-                  title={i18n.t("ticketsList.connectionTitle")}
-                >
-                  {ticket.whatsapp?.name}
-                </div>
-              )}
-            </span>
-          }
-          secondary={
-            <span className={classes.contactNameWrapper}>
-              <Typography
-                className={classes.contactLastMessage}
-                noWrap
-                component="span"
-                variant="body2"
-                color="textSecondary"
-              >
-                {ticket.lastMessage ? (
-                  <MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
-                ) : (
-                  <br />
-                )}
-              </Typography>
-            </span>
-          }
-        />
-        {ticket.status === "pending" && (
-          <ButtonWithSpinner
-            color="primary"
-            variant="contained"
-            className={classes.acceptButton}
-            size="small"
-            loading={loading}
-            onClick={(e: any) => handleAcepptTicket(ticket.id)}
-          >
-            {i18n.t("ticketsList.buttons.accept")}
-          </ButtonWithSpinner>
-        )}
-      </ListItemButton>
+              </span>
+            }
+          />
+          {ticket.status === "pending" && (
+            <ButtonWithSpinner
+              color="primary"
+              variant="contained"
+              className={classes.acceptButton}
+              size="small"
+              loading={loading}
+              onClick={(e: any) => handleAcepptTicket(ticket.id)}
+            >
+              {i18n.t("ticketsList.buttons.accept")}
+            </ButtonWithSpinner>
+          )}
+        </ListItemButton>
+      </Link>
       <Divider variant="inset" component="li" />
     </div>
   );

@@ -147,7 +147,7 @@ export default function Menu(props: Props) {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "93.2vh", overflow: "hidden" }}>
+    <Box sx={{ display: "flex", minHeight: "93.2dvh", overflow: "hidden" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>

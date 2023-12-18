@@ -20,7 +20,7 @@ export default function RootLayout(props: Props) {
   const { children } = props;
   return (
     <html lang="en">
-      <body style={{ minHeight: "100vh", overflow: "hidden" }}>
+      <body style={{ minHeight: "100dvh", overflow: "hidden" }}>
         <ThemeRegistry>
           <AuthProvider>
             <WhatsAppsProvider>

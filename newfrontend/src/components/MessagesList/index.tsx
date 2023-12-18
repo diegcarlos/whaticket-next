@@ -339,9 +339,9 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
             setLoading(false);
           }
 
-          if (pageNumber === 1 && data.messages.length > 1) {
-            scrollToBottom();
-          }
+          // if (pageNumber === 1 && data.messages.length > 1) {
+          //   scrollToBottom();
+          // }
         } catch (err) {
           setLoading(false);
           toastError(err);
@@ -375,13 +375,18 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
     };
   }, [ticketId]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messagesList]);
+
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
   };
 
   const scrollToBottom = () => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({});
+    const endMessage = document.getElementById("endMessage");
+    if (endMessage) {
+      endMessage.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -549,15 +554,15 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
         );
       }
     }
-    if (index === messagesList.length - 1) {
-      return (
-        <div
-          key={`ref-${message.createdAt}`}
-          ref={lastMessageRef}
-          style={{ float: "left", clear: "both" }}
-        />
-      );
-    }
+    // if (index === messagesList.length - 1) {
+    //   return (
+    //     <div
+    //       key={`ref-${message.createdAt}`}
+    //       ref={lastMessageRef}
+    //       style={{ float: "left", clear: "both" }}
+    //     />
+    //   );
+    // }
   };
 
   const renderMessageDivider = (message: any, index: any) => {
@@ -574,6 +579,8 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
   };
 
   const renderQuotedMessage = (message: any) => {
+    const qoute = messagesList.find((f: any) => f.id === message.quotedMsgId);
+    console.log(qoute, "find");
     return (
       <div
         className={clsx(classes.quotedContainerLeft, {
@@ -591,7 +598,12 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
               {message.quotedMsg?.contact?.name}
             </span>
           )}
-          {message.quotedMsg?.body}
+
+          {qoute.mediaType !== "audio" ? (
+            qoute?.body
+          ) : (
+            <Audio url={qoute.mediaUrl} />
+          )}
         </div>
       </div>
     );
@@ -627,12 +639,26 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
                   checkMessageMedia(message)}
                 <div className={classes.textContentItem}>
                   {message.quotedMsg && renderQuotedMessage(message)}
-                  <MarkdownWrapper>{message.body}</MarkdownWrapper>
+                  <MarkdownWrapper>
+                    {message.mediaType === "chat" && message.body}
+                  </MarkdownWrapper>
                   <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
                   </span>
                 </div>
               </div>
+              {index === messagesList.length - 2 && (
+                <div
+                  key={`ref-${message.createdAt}`}
+                  ref={lastMessageRef}
+                  id="endMessage"
+                  style={{
+                    float: "left",
+                    clear: "both",
+                    background: "red",
+                  }}
+                />
+              )}
             </React.Fragment>
           );
         } else {
@@ -668,13 +694,26 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
                     />
                   )}
                   {message.quotedMsg && renderQuotedMessage(message)}
-                  <MarkdownWrapper>{message.body}</MarkdownWrapper>
+                  <MarkdownWrapper>
+                    {message.mediaType === "chat" && message.body}
+                  </MarkdownWrapper>
                   <span className={classes.timestamp}>
                     {format(parseISO(message.createdAt), "HH:mm")}
                     {renderMessageAck(message)}
                   </span>
                 </div>
               </div>
+              {index === messagesList.length - 2 && (
+                <div
+                  key={`ref-${message.createdAt}`}
+                  id="endMessage"
+                  style={{
+                    float: "left",
+                    clear: "both",
+                    background: "red",
+                  }}
+                />
+              )}
             </React.Fragment>
           );
         }

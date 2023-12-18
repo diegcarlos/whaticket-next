@@ -31,25 +31,25 @@ const useStyles = makeStyles<{ [v: string]: CSSProperties }>((theme: any) => ({
   ticketInfo: {
     maxWidth: "50%",
     flexBasis: "50%",
-    // [theme.breakpoints.down("sm")]: {
-    //   maxWidth: "80%",
-    //   flexBasis: "80%",
-    // },
+    [theme.breakpoints?.down("sm")]: {
+      maxWidth: "80%",
+      flexBasis: "80%",
+    },
   },
   ticketActionButtons: {
     maxWidth: "50%",
     flexBasis: "50%",
     display: "flex",
-    // [theme.breakpoints.down("sm")]: {
-    //   maxWidth: "100%",
-    //   flexBasis: "100%",
-    //   marginBottom: "5px",
-    // },
+    [theme.breakpoints?.down("sm")]: {
+      maxWidth: "100%",
+      flexBasis: "100%",
+      marginBottom: "5px",
+    },
   },
 
   mainWrapper: {
     flex: 1,
-    height: "93.5vh",
+    height: "93.5dvh",
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
@@ -57,19 +57,19 @@ const useStyles = makeStyles<{ [v: string]: CSSProperties }>((theme: any) => ({
     borderBottomLeftRadius: 0,
     borderLeft: "0",
     marginRight: -drawerWidth,
-    // transition: theme.transitions.create("margin", {
-    //   easing: theme.transitions.easing.sharp,
-    //   duration: theme.transitions.duration.leavingScreen,
-    // }),
+    transition: theme.transitions?.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
 
   mainWrapperShift: {
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
-    // transition: theme.transitions.create("margin", {
-    //   easing: theme.transitions.easing.easeOut,
-    //   duration: theme.transitions.duration.enteringScreen,
-    // }),
+    transition: theme.transitions?.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
     marginRight: 0,
   },
 }));
@@ -165,10 +165,7 @@ const Ticket = ({ ticketId }: any) => {
           </div>
         </TicketHeader>
         <ReplyMessageProvider>
-          <MessagesList
-            ticketId={ticketId}
-            isGroup={ticket.isGroup}
-          ></MessagesList>
+          <MessagesList ticketId={ticketId} isGroup={ticket.isGroup} />
           <MessageInput ticketStatus={ticket.status} ticketId={ticketId} />
         </ReplyMessageProvider>
       </Paper>

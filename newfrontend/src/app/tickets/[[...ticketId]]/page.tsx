@@ -4,19 +4,18 @@ import TicketsManager from "@/components/TicketsManager";
 import { i18n } from "@/translate/i18n";
 import { Grid, Hidden, Paper } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const useStyles = makeStyles((theme: any) => ({
   chatContainer: {
     flex: 1,
     // // backgroundColor: "#eee",
     // padding: theme.spacing(4),
-    height: `calc(100% - 48px)`,
+    // height: `calc(100% - 48px)`,
     overflowY: "hidden",
   },
 
   chatPaper: {
-    // backgroundColor: "red",
     display: "flex",
     height: "100%",
   },
@@ -59,9 +58,14 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 function Chat({ params }: any) {
-  const {} = useRouter();
   const classes = useStyles();
-  const { ticketId } = params;
+  let { ticketId } = params;
+  const [selectTicketId, setSelectTicketId] = useState<any>(null);
+
+  useEffect(() => {
+    setSelectTicketId(ticketId);
+  }, [ticketId]);
+
   return (
     <div className={classes.chatContainer}>
       <div className={classes.chatPaper}>
@@ -71,14 +75,18 @@ function Chat({ params }: any) {
             xs={12}
             md={4}
             className={
-              ticketId ? classes.contactsWrapperSmall : classes.contactsWrapper
+              selectTicketId
+                ? classes.contactsWrapperSmall
+                : classes.contactsWrapper
             }
           >
-            <TicketsManager />
+            <TicketsManager
+              onSelectTicket={(data) => setSelectTicketId(String(data))}
+            />
           </Grid>
           <Grid item xs={12} md={8} className={classes.messagesWrapper}>
-            {ticketId > 0 ? (
-              <Ticket ticketId={ticketId} />
+            {selectTicketId > 0 ? (
+              <Ticket ticketId={selectTicketId} />
             ) : (
               <Hidden only={["sm", "xs"]}>
                 <Paper className={classes.welcomeMsg}>

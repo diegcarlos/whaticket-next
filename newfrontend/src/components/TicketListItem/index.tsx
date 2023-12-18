@@ -18,8 +18,7 @@ import { i18n } from "../../translate/i18n";
 import useAccess from "@/context/AuthContext";
 import { green } from "@mui/material/colors";
 import { makeStyles } from "@mui/styles";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
@@ -120,10 +119,16 @@ const useStyles = makeStyles((theme: any) => ({
   },
 }));
 
-const TicketListItem = ({ ticket, ticketId }: any) => {
+interface Props {
+  ticket: any;
+  ticketId: string;
+  onTicketSelect?: (data: string) => void;
+}
+
+const TicketListItem = ({ ticket, ticketId, onTicketSelect }: Props) => {
   const classes = useStyles();
   const history = useRouter();
-  const path = usePathname();
+  const search = useSearchParams();
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
   const { user } = useAccess();
@@ -151,122 +156,117 @@ const TicketListItem = ({ ticket, ticketId }: any) => {
     history.push(`/tickets/${id}`);
   };
 
-  const handleSelectTicket = (id: any) => {
-    history.push(`/tickets/${id}`);
+  const handleClickTicket = (id: string) => {
+    window.history.pushState({}, "", `/tickets/${id}`);
+    onTicketSelect?.(id);
   };
 
   return (
     <div key={ticket.id}>
-      <Link
-        style={{ textDecoration: "none" }}
-        href="/tickets/[ticketId]"
-        as={`/tickets/${ticket.id}`}
-        passHref
+      <ListItemButton
+        dense
+        onClick={() => handleClickTicket(ticket.id)}
+        selected={ticketId === ticket.id}
+        className={clsx(classes.ticket, {
+          [classes.pendingTicket]: ticket.status === "pending",
+        })}
       >
-        <ListItemButton
-          dense
-          selected={ticketId && +ticketId === ticket.id}
-          className={clsx(classes.ticket, {
-            [classes.pendingTicket]: ticket.status === "pending",
-          })}
+        <Tooltip
+          arrow
+          placement="right"
+          title={ticket.queue?.name || "Sem fila"}
         >
-          <Tooltip
-            arrow
-            placement="right"
-            title={ticket.queue?.name || "Sem fila"}
-          >
-            <span
-              style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
-              className={classes.ticketQueueColor}
-            ></span>
-          </Tooltip>
-          <ListItemAvatar>
-            <Avatar src={ticket?.contact?.profilePicUrl} />
-          </ListItemAvatar>
-          <ListItemText
-            disableTypography
-            primary={
-              <span className={classes.contactNameWrapper}>
-                <Typography
-                  noWrap
-                  component="span"
-                  variant="body2"
-                  color="textPrimary"
-                >
-                  <div style={{ display: "flex", gap: 15, width: "100%" }}>
-                    <span>{ticket.contact.name}</span>
-                    <Badge
-                      className={classes.newMessagesCount}
-                      badgeContent={ticket.unreadMessages}
-                      classes={{
-                        badge: classes.badgeStyle,
-                      }}
-                    />
-                  </div>
-                </Typography>
-                {ticket.status === "closed" && (
+          <span
+            style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
+            className={classes.ticketQueueColor}
+          ></span>
+        </Tooltip>
+        <ListItemAvatar>
+          <Avatar src={ticket?.contact?.profilePicUrl} />
+        </ListItemAvatar>
+        <ListItemText
+          disableTypography
+          primary={
+            <span className={classes.contactNameWrapper}>
+              <Typography
+                noWrap
+                component="span"
+                variant="body2"
+                color="textPrimary"
+              >
+                <div style={{ display: "flex", gap: 15, width: "100%" }}>
+                  <span>{ticket.contact.name}</span>
                   <Badge
-                    className={classes.closedBadge}
-                    badgeContent={"closed"}
-                    color="primary"
+                    className={classes.newMessagesCount}
+                    badgeContent={ticket.unreadMessages}
+                    classes={{
+                      badge: classes.badgeStyle,
+                    }}
                   />
-                )}
-                {ticket.lastMessage && (
-                  <Typography
-                    className={classes.lastMessageTime}
-                    component="span"
-                    variant="body2"
-                    color="textSecondary"
-                  >
-                    {isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
-                      <>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
-                    ) : (
-                      <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
-                    )}
-                  </Typography>
-                )}
-                {ticket.whatsappId && (
-                  <div
-                    className={classes.userTag}
-                    title={i18n.t("ticketsList.connectionTitle")}
-                  >
-                    {ticket.whatsapp?.name}
-                  </div>
-                )}
-              </span>
-            }
-            secondary={
-              <span className={classes.contactNameWrapper}>
+                </div>
+              </Typography>
+              {ticket.status === "closed" && (
+                <Badge
+                  className={classes.closedBadge}
+                  badgeContent={"closed"}
+                  color="primary"
+                />
+              )}
+              {ticket.lastMessage && (
                 <Typography
-                  className={classes.contactLastMessage}
-                  noWrap
+                  className={classes.lastMessageTime}
                   component="span"
                   variant="body2"
                   color="textSecondary"
                 >
-                  {ticket.lastMessage ? (
-                    <MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
+                  {isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
+                    <>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
                   ) : (
-                    <br />
+                    <>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
                   )}
                 </Typography>
-              </span>
-            }
-          />
-          {ticket.status === "pending" && (
-            <ButtonWithSpinner
-              color="primary"
-              variant="contained"
-              className={classes.acceptButton}
-              size="small"
-              loading={loading}
-              onClick={(e: any) => handleAcepptTicket(ticket.id)}
-            >
-              {i18n.t("ticketsList.buttons.accept")}
-            </ButtonWithSpinner>
-          )}
-        </ListItemButton>
-      </Link>
+              )}
+              {ticket.whatsappId && (
+                <div
+                  className={classes.userTag}
+                  title={i18n.t("ticketsList.connectionTitle")}
+                >
+                  {ticket.whatsapp?.name}
+                </div>
+              )}
+            </span>
+          }
+          secondary={
+            <span className={classes.contactNameWrapper}>
+              <Typography
+                className={classes.contactLastMessage}
+                noWrap
+                component="span"
+                variant="body2"
+                color="textSecondary"
+              >
+                {ticket.lastMessage ? (
+                  <MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
+                ) : (
+                  <br />
+                )}
+              </Typography>
+            </span>
+          }
+        />
+        {ticket.status === "pending" && (
+          <ButtonWithSpinner
+            color="primary"
+            variant="contained"
+            className={classes.acceptButton}
+            size="small"
+            loading={loading}
+            onClick={(e: any) => handleAcepptTicket(ticket.id)}
+          >
+            {i18n.t("ticketsList.buttons.accept")}
+          </ButtonWithSpinner>
+        )}
+      </ListItemButton>
       <Divider variant="inset" component="li" />
     </div>
   );

@@ -1,14 +1,14 @@
 import {
-  Table,
+  BelongsTo,
   Column,
   CreatedAt,
-  UpdatedAt,
-  Model,
   DataType,
-  PrimaryKey,
   Default,
-  BelongsTo,
-  ForeignKey
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt
 } from "sequelize-typescript";
 import Contact from "./Contact";
 import Ticket from "./Ticket";

@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 
 function toastError(err: any) {
+  console.log(err);
   const errorMsg: string =
     err.response?.data?.message || err.response?.data?.error;
   const backendErrors: any = {

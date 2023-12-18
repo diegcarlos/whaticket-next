@@ -1,5 +1,6 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
+import { useSearchParams } from "next/navigation";
 import NewTicketModal from "../NewTicketModal";
 import TabPanel from "../TabPanel";
 import TicketsList from "../TicketsList";
@@ -87,14 +88,21 @@ const classes: { [v: string]: CSSProperties } = {
   },
 };
 
-const TicketsManager = () => {
+interface Props {
+  onSelectTicket?: (data: string | null) => void;
+}
+
+const TicketsManager = (props: Props) => {
   const [searchParam, setSearchParam] = useState("");
   const [tab, setTab] = useState("open");
   const [tabOpen, setTabOpen] = useState("open");
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
   const [showAllTickets, setShowAllTickets] = useState(false);
+  const [ticketId, setTicketId] = useState<string | null>(null);
   const searchInputRef = useRef<any>();
   const { user } = useAccess();
+  const search = useSearchParams();
+  const { onSelectTicket } = props;
 
   const [openCount, setOpenCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
@@ -106,7 +114,12 @@ const TicketsManager = () => {
     if (user.profile?.toUpperCase() === "ADMIN") {
       setShowAllTickets(true);
     }
+    setTicketId(search.get("ticketId"));
   }, []);
+
+  useEffect(() => {
+    onSelectTicket?.(String(ticketId));
+  }, [ticketId]);
 
   useEffect(() => {
     if (tab === "search") {
@@ -265,6 +278,8 @@ const TicketsManager = () => {
         </Tabs>
         <Paper sx={classes.ticketsWrapper}>
           <TicketsList
+            ticketId={ticketId}
+            onTicketSelect={(data) => setTicketId(data)}
             status="open"
             showAll={showAllTickets}
             selectedQueueIds={selectedQueueIds}
@@ -272,6 +287,8 @@ const TicketsManager = () => {
             style={applyPanelStyle("open")}
           />
           <TicketsList
+            ticketId={ticketId}
+            onTicketSelect={(data) => setTicketId(data)}
             status="pending"
             selectedQueueIds={selectedQueueIds}
             updateCount={(val: any) => setPendingCount(val)}
@@ -281,6 +298,8 @@ const TicketsManager = () => {
       </TabPanel>
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
         <TicketsList
+          ticketId={ticketId}
+          onTicketSelect={(data) => setTicketId(data)}
           status="closed"
           showAll={true}
           selectedQueueIds={selectedQueueIds}
@@ -288,6 +307,8 @@ const TicketsManager = () => {
       </TabPanel>
       <TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
         <TicketsList
+          ticketId={ticketId}
+          onTicketSelect={(data) => setTicketId(data)}
           searchParam={searchParam}
           showAll={true}
           selectedQueueIds={selectedQueueIds}

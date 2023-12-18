@@ -148,10 +148,30 @@ const reducer = (state: any, action: any) => {
   }
 };
 
-function TicketsList(props: any) {
-  const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
-    props;
+interface Props {
+  status?: any;
+  searchParam?: any;
+  showAll?: any;
+  selectedQueueIds?: any;
+  updateCount?: any;
+  style?: any;
+  ticketId: any;
+  onTicketSelect?: (data: string) => void;
+}
+
+function TicketsList(props: Props) {
+  const {
+    status,
+    searchParam,
+    showAll,
+    selectedQueueIds,
+    updateCount,
+    style,
+    ticketId,
+    onTicketSelect,
+  } = props;
   const [pageNumber, setPageNumber] = useState(1);
+  const [selectTicketId, setSelectTicketId] = useState(null);
   const [ticketsList, dispatch] = useReducer(reducer, []);
   const { user } = useAccess();
 
@@ -272,7 +292,7 @@ function TicketsList(props: any) {
         sx={classes.ticketsList}
         onScroll={handleScroll}
       >
-        <List style={{ padding: 0, height: "65vh", overflow: "auto" }}>
+        <List style={{ padding: 0, height: "65dvh", overflow: "auto" }}>
           {ticketsList?.length === 0 && !loading ? (
             <div style={classes.noTicketsDiv}>
               <span style={classes.noTicketsTitle}>
@@ -286,7 +306,12 @@ function TicketsList(props: any) {
             <>
               {ticketsList?.map((ticket) => (
                 <>
-                  <TicketListItem ticket={ticket} key={ticket.id} />
+                  <TicketListItem
+                    ticket={ticket}
+                    key={ticket.id}
+                    onTicketSelect={(data) => onTicketSelect?.(data)}
+                    ticketId={ticketId}
+                  />
                 </>
               ))}
             </>

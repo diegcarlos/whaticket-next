@@ -3,19 +3,19 @@ import Ticket from "@/components/Ticket";
 import TicketsManager from "@/components/TicketsManager";
 import { i18n } from "@/translate/i18n";
 import { Grid, Hidden, Paper } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import { useRouter } from "next/navigation";
-import { CSSProperties } from "react";
 
-const classes: { [v: string]: CSSProperties } = {
+const useStyles = makeStyles((theme: any) => ({
   chatContainer: {
     flex: 1,
     // // backgroundColor: "#eee",
     // padding: theme.spacing(4),
-    height: `100%`,
+    height: `calc(100% - 48px)`,
     overflowY: "hidden",
   },
 
-  chatPapper: {
+  chatPaper: {
     // backgroundColor: "red",
     display: "flex",
     height: "100%",
@@ -32,8 +32,11 @@ const classes: { [v: string]: CSSProperties } = {
     height: "100%",
     flexDirection: "column",
     overflowY: "hidden",
+    [theme.breakpoints?.down("sm")]: {
+      display: "none",
+    },
   },
-  messagessWrapper: {
+  messagesWrapper: {
     display: "flex",
     height: "100%",
     flexDirection: "column",
@@ -48,36 +51,37 @@ const classes: { [v: string]: CSSProperties } = {
     borderRadius: 0,
   },
   ticketsManager: {},
-};
+  ticketsManagerClosed: {
+    [theme.breakpoints?.down("sm")]: {
+      display: "none",
+    },
+  },
+}));
 
 function Chat({ params }: any) {
   const {} = useRouter();
+  const classes = useStyles();
   const { ticketId } = params;
   return (
-    <div style={classes.chatContainer}>
-      <div style={classes.chatPapper}>
+    <div className={classes.chatContainer}>
+      <div className={classes.chatPaper}>
         <Grid container spacing={0}>
-          {/* <Grid item xs={4} style={classes.contactsWrapper}> */}
           <Grid
             item
             xs={12}
             md={4}
-            sx={
+            className={
               ticketId ? classes.contactsWrapperSmall : classes.contactsWrapper
             }
           >
             <TicketsManager />
           </Grid>
-          <Grid item xs={12} md={8} sx={classes.messagessWrapper}>
-            {/* <Grid item xs={8} style={classes.messagessWrapper}> */}
+          <Grid item xs={12} md={8} className={classes.messagesWrapper}>
             {ticketId > 0 ? (
-              <>
-                <Ticket ticketId={ticketId} />
-              </>
+              <Ticket ticketId={ticketId} />
             ) : (
               <Hidden only={["sm", "xs"]}>
-                <Paper style={classes.welcomeMsg}>
-                  {/* <Paper square variant="outlined" className={classes.welcomeMsg}> */}
+                <Paper className={classes.welcomeMsg}>
                   <span>{i18n.t("chat.noTicketMessage")}</span>
                 </Paper>
               </Hidden>

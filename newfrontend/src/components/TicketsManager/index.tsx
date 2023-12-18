@@ -1,4 +1,3 @@
-"use client";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
 import NewTicketModal from "../NewTicketModal";
@@ -107,7 +106,6 @@ const TicketsManager = () => {
     if (user.profile?.toUpperCase() === "ADMIN") {
       setShowAllTickets(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

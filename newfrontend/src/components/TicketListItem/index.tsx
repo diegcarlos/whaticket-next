@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useRef, useState } from "react";
 
 import clsx from "clsx";
@@ -20,7 +19,7 @@ import useAccess from "@/context/AuthContext";
 import { green } from "@mui/material/colors";
 import { makeStyles } from "@mui/styles";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
@@ -124,6 +123,7 @@ const useStyles = makeStyles((theme: any) => ({
 const TicketListItem = ({ ticket, ticketId }: any) => {
   const classes = useStyles();
   const history = useRouter();
+  const path = usePathname();
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
   const { user } = useAccess();
@@ -157,20 +157,14 @@ const TicketListItem = ({ ticket, ticketId }: any) => {
 
   return (
     <div key={ticket.id}>
-      <Link href="/tickets/[ticketId]" as={`/tickets/${ticket.id}`}>
-        {ticket.id}
-      </Link>
       <Link
         style={{ textDecoration: "none" }}
         href="/tickets/[ticketId]"
         as={`/tickets/${ticket.id}`}
+        passHref
       >
         <ListItemButton
           dense
-          // onClick={(e: any) => {
-          //   if (ticket.status === "pending") return;
-          //   handleSelectTicket(ticket.id);
-          // }}
           selected={ticketId && +ticketId === ticket.id}
           className={clsx(classes.ticket, {
             [classes.pendingTicket]: ticket.status === "pending",

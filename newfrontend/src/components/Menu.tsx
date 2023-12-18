@@ -234,7 +234,7 @@ export default function Menu(props: Props) {
 }
 
 const Listbox = styled("ul")(
-  ({ theme }) => `
+  () => `
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.875rem;
   box-sizing: border-box;

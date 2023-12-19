@@ -17,6 +17,11 @@ import {
   DoneAll,
   ExpandMore,
   GetApp,
+  Image,
+  Mic,
+  Person,
+  Room,
+  Videocam,
 } from "@mui/icons-material";
 import { Button, CircularProgress, Divider, IconButton } from "@mui/material";
 import { green } from "@mui/material/colors";
@@ -26,6 +31,7 @@ import api from "../../services/api";
 import Audio from "../Audio";
 
 import "./styled.css";
+import { useLogic } from "./useLogic";
 
 const useStyles = makeStyles((theme: any) => ({
   messagesListWrapper: {
@@ -253,6 +259,18 @@ const useStyles = makeStyles((theme: any) => ({
     backgroundColor: "inherit",
     padding: 10,
   },
+  quoteMedia: {
+    color: "#5e5e5e",
+    fontSize: 13,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "end",
+    gap: 5,
+  },
+  quoteMediaVideo: {
+    width: 58,
+    height: 54,
+  },
 }));
 
 const reducer = (state: any, action: any) => {
@@ -316,6 +334,8 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
+
+  const { audioTime } = useLogic();
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -478,9 +498,13 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
       /^.*\.(jpe?g|png|gif)?$/i.exec(message.mediaUrl) &&
       message.mediaType === "image"
     ) {
-      return <ModalImageCors imageUrl={message.mediaUrl} />;
+      return (
+        <div style={{ width: "300px" }}>
+          <ModalImageCors imageUrl={message.mediaUrl} />
+        </div>
+      );
     } else if (message.mediaType === "audio") {
-      return <Audio url={message.mediaUrl} />;
+      return <Audio id={`audio-${message.id}`} url={message.mediaUrl} />;
     } else if (message.mediaType === "video") {
       return (
         <video
@@ -578,34 +602,102 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
     }
   };
 
-  const renderQuotedMessage = (message: any) => {
-    const qoute = messagesList.find((f: any) => f.id === message.quotedMsgId);
-    console.log(qoute, "find");
-    return (
-      <div
-        className={clsx(classes.quotedContainerLeft, {
-          [classes.quotedContainerRight]: message.fromMe,
-        })}
-      >
-        <span
-          className={clsx(classes.quotedSideColorLeft, {
-            [classes.quotedSideColorRight]: message.quotedMsg?.fromMe,
-          })}
-        ></span>
-        <div className={classes.quotedMsg}>
-          {!message.quotedMsg?.fromMe && (
-            <span className={classes.messageContactName}>
-              {message.quotedMsg?.contact?.name}
-            </span>
-          )}
+  const renderQuoteMedia = (
+    type: "audio" | "chat" | "video" | "image" | "vcard" | "location",
+    message: any
+  ) => {
+    switch (type) {
+      case "audio":
+        return (
+          <div className={classes.quoteMedia}>
+            <Mic fontSize="small" /> Mensagem de voz
+          </div>
+        );
+        break;
+      case "video":
+        return (
+          <div className={classes.quoteMedia}>
+            <Videocam fontSize="small" /> Video
+            <video
+              className={classes.quoteMediaVideo}
+              src={message.mediaUrl}
+            ></video>
+          </div>
+        );
+        break;
 
-          {qoute.mediaType !== "audio" ? (
-            qoute?.body
-          ) : (
-            <Audio url={qoute.mediaUrl} />
-          )}
+      case "image":
+        return (
+          <div className={classes.quoteMedia}>
+            <Image fontSize="small" /> Foto
+            <img
+              src={message.mediaUrl}
+              style={{ objectFit: "cover", width: 58, height: 54 }}
+              alt=""
+            />
+          </div>
+        );
+        break;
+
+      case "vcard":
+        return (
+          <div className={classes.quoteMedia}>
+            <Person fontSize="small" /> Contato
+          </div>
+        );
+        break;
+
+      case "location":
+        return (
+          <div className={classes.quoteMedia}>
+            <Room fontSize="small" /> Localização
+          </div>
+        );
+        break;
+
+      case "chat":
+        return (
+          <div style={{ color: "#5e5e5e", fontSize: 13 }}>{message.body}</div>
+        );
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const renderQuotedMessage = (message: any) => {
+    const quote = messagesList.find((f: any) => f.id === message.quotedMsgId);
+    return (
+      <a
+        style={{ textDecoration: "none", color: "#000" }}
+        href={`#tick-${message.quotedMsgId}`}
+      >
+        <div
+          id={`tick-${message.quotedMsgId}`}
+          className={clsx(classes.quotedContainerLeft, {
+            [classes.quotedContainerRight]: message.fromMe,
+          })}
+        >
+          <span
+            className={clsx(classes.quotedSideColorLeft, {
+              [classes.quotedSideColorRight]: message.quotedMsg?.fromMe,
+            })}
+          ></span>
+          <div className={classes.quotedMsg}>
+            {!message.quotedMsg?.fromMe && (
+              <span className={classes.messageContactName}>
+                {message.quotedMsg?.contact?.name}
+              </span>
+            )}
+
+            {
+              renderQuoteMedia(quote?.mediaType, quote)
+              // <Audio url={quote.mediaUrl} />
+            }
+          </div>
         </div>
-      </div>
+      </a>
     );
   };
 
@@ -617,7 +709,7 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageLeft}>
+              <div id={`tick-${message.id}`} className={classes.messageLeft}>
                 <IconButton
                   size="small"
                   id="messageActionsButton"
@@ -666,7 +758,10 @@ const MessagesList = ({ ticketId, isGroup }: any) => {
             <React.Fragment key={message.id}>
               {renderDailyTimestamps(message, index)}
               {renderMessageDivider(message, index)}
-              <div className={classes.messageRight}>
+              <div
+                id={`tick-${message.quotedMsgId}`}
+                className={classes.messageRight}
+              >
                 <IconButton
                   size="small"
                   id="messageActionsButton"

@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Field, FieldArray, Form, Formik } from "formik";
 import { toast } from "react-toastify";
@@ -17,16 +17,18 @@ import {
   Typography,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
+import { makeStyles } from "@mui/styles";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 
-const classes: { [v: string]: CSSProperties } = {
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexWrap: "wrap",
   },
   textField: {
+    marginRight: 1,
     flex: 1,
   },
 
@@ -48,7 +50,7 @@ const classes: { [v: string]: CSSProperties } = {
     marginTop: -12,
     marginLeft: -12,
   },
-};
+}));
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string()
@@ -59,13 +61,14 @@ const ContactSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email"),
 });
 
-function ContactModal({
+const ContactModal = ({
   open,
   onClose,
   contactId,
   initialValues,
   onSave,
-}: any) {
+}: any) => {
+  const classes = useStyles();
   const isMounted = useRef(true);
 
   const initialState = {
@@ -94,9 +97,8 @@ function ContactModal({
 
       try {
         const { data } = await api.get(`/contacts/${contactId}`);
-        if (isMounted.current) {
-          setContact(data);
-        }
+
+        setContact(data);
       } catch (err) {
         toastError(err);
       }
@@ -129,7 +131,7 @@ function ContactModal({
   };
 
   return (
-    <div style={classes.root}>
+    <div className={classes.root}>
       <Dialog open={open} onClose={handleClose} maxWidth="lg" scroll="paper">
         <DialogTitle id="form-dialog-title">
           {contactId
@@ -162,7 +164,7 @@ function ContactModal({
                   helperText={touched.name && errors.name}
                   variant="outlined"
                   margin="dense"
-                  style={classes.textField}
+                  className={classes.textField}
                 />
                 <Field
                   as={TextField}
@@ -199,15 +201,18 @@ function ContactModal({
                     <>
                       {values.extraInfo &&
                         values.extraInfo.length > 0 &&
-                        values.extraInfo.map((info: any, index: number) => (
-                          <div style={classes.extraAttr} key={`${index}-info`}>
+                        values.extraInfo.map((info: any, index: any) => (
+                          <div
+                            className={classes.extraAttr}
+                            key={`${index}-info`}
+                          >
                             <Field
                               as={TextField}
                               label={i18n.t("contactModal.form.extraName")}
                               name={`extraInfo[${index}].name`}
                               variant="outlined"
                               margin="dense"
-                              style={classes.textField}
+                              className={classes.textField}
                             />
                             <Field
                               as={TextField}
@@ -215,7 +220,7 @@ function ContactModal({
                               name={`extraInfo[${index}].value`}
                               variant="outlined"
                               margin="dense"
-                              style={classes.textField}
+                              className={classes.textField}
                             />
                             <IconButton
                               size="small"
@@ -225,7 +230,7 @@ function ContactModal({
                             </IconButton>
                           </div>
                         ))}
-                      <div style={classes.extraAttr}>
+                      <div className={classes.extraAttr}>
                         <Button
                           style={{ flex: 1, marginTop: 8 }}
                           variant="outlined"
@@ -253,7 +258,7 @@ function ContactModal({
                   color="primary"
                   disabled={isSubmitting}
                   variant="contained"
-                  style={classes.btnWrapper}
+                  className={classes.btnWrapper}
                 >
                   {contactId
                     ? `${i18n.t("contactModal.buttons.okEdit")}`
@@ -261,7 +266,7 @@ function ContactModal({
                   {isSubmitting && (
                     <CircularProgress
                       size={24}
-                      style={classes.buttonProgress}
+                      className={classes.buttonProgress}
                     />
                   )}
                 </Button>
@@ -272,6 +277,6 @@ function ContactModal({
       </Dialog>
     </div>
   );
-}
+};
 
 export default ContactModal;

@@ -54,7 +54,7 @@ const reducer = (state: any, action: any) => {
 };
 
 const useWhatsApps = () => {
-  const [whatsApps, dispatch] = useReducer(reducer, []);
+  const [whatsApps, dispatch]: any = useReducer(reducer, []);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -14,7 +14,7 @@ const useTickets = ({
 }: any) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
-  const [tickets, setTickets] = useState([]);
+  const [tickets, setTickets] = useState<any>([]);
   const [count, setCount] = useState(0);
 
   useEffect(() => {

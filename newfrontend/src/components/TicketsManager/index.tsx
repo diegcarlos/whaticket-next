@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import NewTicketModal from "../NewTicketModal";
 import TabPanel from "../TabPanel";
 import TicketsList from "../TicketsList";
@@ -101,7 +101,8 @@ const TicketsManager = (props: Props) => {
   const [ticketId, setTicketId] = useState<string | null>(null);
   const searchInputRef = useRef<any>();
   const { user } = useAccess();
-  const search = useSearchParams();
+  const search = useParams<{ ticketId: string }>();
+
   const { onSelectTicket } = props;
 
   const [openCount, setOpenCount] = useState(0);
@@ -114,7 +115,8 @@ const TicketsManager = (props: Props) => {
     if (user.profile?.toUpperCase() === "ADMIN") {
       setShowAllTickets(true);
     }
-    setTicketId(search.get("ticketId"));
+
+    setTicketId(search.ticketId?.[0]);
   }, []);
 
   useEffect(() => {

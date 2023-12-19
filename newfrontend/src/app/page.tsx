@@ -2,32 +2,69 @@
 import Chart from "@/components/Chart";
 import useAccess from "@/context/AuthContext";
 import useTickets from "@/hooks/useTickets";
+import { i18n } from "@/translate/i18n";
 import { Container, Grid, Paper, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
-export default function HomePage() {
+const useStyles = makeStyles(() => ({
+  container: {
+    paddingTop: 4,
+    paddingBottom: 4,
+  },
+  fixedHeightPaper: {
+    padding: 8,
+    display: "flex",
+    overflow: "hidden",
+    flexDirection: "column",
+    height: 240,
+  },
+  customFixedHeightPaper: {
+    padding: 6,
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+    height: 120,
+  },
+  customFixedHeightPaperLg: {
+    padding: 2,
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+    height: "100%",
+  },
+}));
+
+const Dashboard = () => {
+  const classes = useStyles();
+
   const { user } = useAccess();
-  var userQueueIds: number[] = [];
+  var userQueueIds: any = [];
 
   if (user.queues && user.queues.length > 0) {
     userQueueIds = user.queues.map((q) => q.id);
   }
-  const GetTickets = (status: any, showAll: any, withUnreadMessages: any) => {
+
+  const GetTickets = (status: any, showAll: any, withUnreadMessage: any) => {
     const { count } = useTickets({
       status: status,
       showAll: showAll,
-      withUnreadMessages: withUnreadMessages,
+      withUnreadMessages: withUnreadMessage,
       queueIds: JSON.stringify(userQueueIds),
     });
     return count;
   };
+
   return (
     <div>
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={4}>
-            <Paper style={{ overflow: "hidden", padding: 30 }}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                Em Atendimento
+                {i18n.t("dashboard.messages.inAttendance.title")}
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
@@ -37,9 +74,12 @@ export default function HomePage() {
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper style={{ overflow: "hidden", padding: 30 }}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                Aguardando
+                {i18n.t("dashboard.messages.waiting.title")}
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
@@ -49,9 +89,12 @@ export default function HomePage() {
             </Paper>
           </Grid>
           <Grid item xs={4}>
-            <Paper style={{ overflow: "hidden", padding: 30 }}>
+            <Paper
+              className={classes.customFixedHeightPaper}
+              style={{ overflow: "hidden" }}
+            >
               <Typography component="h3" variant="h6" color="primary" paragraph>
-                Finalizado
+                {i18n.t("dashboard.messages.closed.title")}
               </Typography>
               <Grid item>
                 <Typography component="h1" variant="h4">
@@ -61,7 +104,7 @@ export default function HomePage() {
             </Paper>
           </Grid>
           <Grid item xs={12}>
-            <Paper>
+            <Paper className={classes.fixedHeightPaper}>
               <Chart />
             </Paper>
           </Grid>
@@ -69,4 +112,6 @@ export default function HomePage() {
       </Container>
     </div>
   );
-}
+};
+
+export default Dashboard;

@@ -48,6 +48,7 @@
     "@types/yup": "^0.32.0",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "file-loader": "^6.2.0",
     "typescript": "latest"
   }
 }

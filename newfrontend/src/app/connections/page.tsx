@@ -5,6 +5,7 @@ import MainHeader from "@/components/MainHeader";
 import MainHeaderButtonsWrapper from "@/components/MainHeaderButtonsWrapper";
 import QrcodeModal from "@/components/QrcodeModal";
 import TableRowSkeleton from "@/components/TableRowSkeleton";
+import Title from "@/components/Title";
 import WhatsAppModal from "@/components/WhatsAppModal";
 import { useAccessWhats } from "@/context/WhatsApp/WhatsAppsContext";
 import toastError from "@/errors/toastError";
@@ -262,7 +263,7 @@ const Connections = () => {
         whatsAppId={!qrModalOpen && selectedWhatsApp?.id}
       />
       <MainHeader>
-        <h2>{i18n.t("connections.title")}</h2>
+        <Title>{i18n.t("connections.title")}</Title>
         <MainHeaderButtonsWrapper>
           <Button
             variant="contained"

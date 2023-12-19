@@ -6,7 +6,7 @@ import api from "../../services/api";
 const classes: { [v: string]: CSSProperties } = {
   messageMedia: {
     objectFit: "cover",
-    width: 250,
+    width: 100,
     height: 200,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,

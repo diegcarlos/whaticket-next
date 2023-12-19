@@ -1,10 +1,11 @@
 import { Chip, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { CSSProperties, useEffect, useState } from "react";
+import { makeStyles } from "@mui/styles";
+import { useEffect, useState } from "react";
 import toastError from "../../errors/toastError";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 
-const classes: { [v: string]: CSSProperties } = {
+const useStyles = makeStyles((theme) => ({
   chips: {
     display: "flex",
     flexWrap: "wrap",
@@ -12,15 +13,10 @@ const classes: { [v: string]: CSSProperties } = {
   chip: {
     margin: 2,
   },
-};
+}));
 
-interface Props {
-  selectedQueueIds: any[];
-  onChange: (data: any) => void;
-}
-
-const QueueSelect = (props: Props) => {
-  const { selectedQueueIds, onChange } = props;
+const QueueSelect = ({ selectedQueueIds, onChange }: any) => {
+  const classes = useStyles();
   const [queues, setQueues] = useState([]);
 
   useEffect(() => {
@@ -40,7 +36,7 @@ const QueueSelect = (props: Props) => {
 
   return (
     <div style={{ marginTop: 6 }}>
-      <FormControl fullWidth margin="dense" variant="outlined">
+      <FormControl margin="dense" variant="outlined">
         <InputLabel>{i18n.t("queueSelect.inputLabel")}</InputLabel>
         <Select
           multiple
@@ -57,9 +53,9 @@ const QueueSelect = (props: Props) => {
             },
           }}
           renderValue={(selected) => (
-            <div style={classes.chips}>
+            <div className={classes.chips}>
               {selected?.length > 0 &&
-                selected.map((id) => {
+                selected.map((id: any) => {
                   const queue: any = queues.find((q: any) => q.id === id);
                   return queue ? (
                     <Chip
@@ -67,7 +63,7 @@ const QueueSelect = (props: Props) => {
                       style={{ backgroundColor: queue.color }}
                       variant="outlined"
                       label={queue.name}
-                      sx={classes.chip}
+                      className={classes.chip}
                     />
                   ) : null;
                 })}

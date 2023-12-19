@@ -171,7 +171,6 @@ function TicketsList(props: Props) {
     onTicketSelect,
   } = props;
   const [pageNumber, setPageNumber] = useState(1);
-  const [selectTicketId, setSelectTicketId] = useState(null);
   const [ticketsList, dispatch] = useReducer(reducer, []);
   const { user } = useAccess();
 
@@ -195,6 +194,14 @@ function TicketsList(props: Props) {
       payload: tickets,
     });
   }, [tickets]);
+
+  useEffect(() => {
+    if (!status && !searchParam) return;
+    dispatch({
+      type: "LOAD_TICKETS",
+      payload: tickets,
+    });
+  }, []);
 
   useEffect(() => {
     const socket = openSocket();
@@ -266,7 +273,6 @@ function TicketsList(props: Props) {
     if (typeof updateCount === "function") {
       updateCount(ticketsList?.length);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketsList]);
 
   const loadMore = () => {

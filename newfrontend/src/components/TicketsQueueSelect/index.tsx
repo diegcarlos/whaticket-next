@@ -20,6 +20,7 @@ const TicketsQueueSelect = ({
     <div style={{ width: 120, marginTop: -4 }}>
       <FormControl fullWidth margin="dense">
         <Select
+          size="small"
           multiple
           displayEmpty
           variant="outlined"

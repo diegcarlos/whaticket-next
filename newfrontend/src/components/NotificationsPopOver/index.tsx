@@ -1,8 +1,4 @@
-import { CSSProperties, useEffect, useRef, useState } from "react";
-
-import { format } from "date-fns";
-import useSound from "use-sound";
-import openSocket from "../../services/socket-io";
+import { useEffect, useRef, useState } from "react";
 
 import useAccess from "@/context/AuthContext";
 import { Chat } from "@mui/icons-material";
@@ -14,29 +10,40 @@ import {
   ListItemText,
   Popover,
 } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import useSound from "use-sound";
 //@ts-ignore
 import alertSound from "../../assets/sound.mp3";
 import useTickets from "../../hooks/useTickets";
+import openSocket from "../../services/socket-io";
 import { i18n } from "../../translate/i18n";
 import TicketListItem from "../TicketListItem";
 
-const classes: { [v: string]: CSSProperties } = {
+const useStyles = makeStyles((theme: any) => ({
   tabContainer: {
     overflowY: "auto",
     maxHeight: 350,
+    ...theme.scrollbarStyles,
   },
   popoverPaper: {
     width: "100%",
     maxWidth: 350,
+    marginLeft: 2,
+    marginRight: 2,
+    [theme.breakpoints?.down("sm")]: {
+      maxWidth: 270,
+    },
   },
-
   noShadow: {
     boxShadow: "none !important",
   },
-};
+}));
 
 const NotificationsPopOver = () => {
+  const classes = useStyles();
+
   const history = useRouter();
   const { user } = useAccess();
   const ticketIdUrl = "";
@@ -76,7 +83,7 @@ const NotificationsPopOver = () => {
 
     socket.on("connect", () => socket.emit("joinNotification"));
 
-    socket.on("ticket", (data: any) => {
+    socket.on("ticket", (data) => {
       if (data.action === "updateUnread" || data.action === "delete") {
         setNotifications((prevState: any) => {
           const ticketIndex = prevState.findIndex(
@@ -103,7 +110,7 @@ const NotificationsPopOver = () => {
       }
     });
 
-    socket.on("appMessage", (data: any) => {
+    socket.on("appMessage", (data) => {
       if (
         data.action === "create" &&
         !data.message.read &&
@@ -173,7 +180,7 @@ const NotificationsPopOver = () => {
   };
 
   const handleClick = () => {
-    setIsOpen((prevState: any) => !prevState);
+    setIsOpen((prevState) => !prevState);
   };
 
   const handleClickAway = () => {
@@ -188,7 +195,6 @@ const NotificationsPopOver = () => {
     <>
       <IconButton
         onClick={handleClick}
-        // ref={anchorEl}
         aria-label="Open Notifications"
         color="inherit"
       >
@@ -198,19 +204,21 @@ const NotificationsPopOver = () => {
       </IconButton>
       <Popover
         disableScrollLock
+        sx={{ marginTop: 5 }}
         open={isOpen}
         anchorEl={anchorEl.current}
         anchorOrigin={{
-          vertical: "bottom",
+          vertical: "top",
           horizontal: "right",
         }}
         transformOrigin={{
           vertical: "top",
           horizontal: "right",
         }}
+        classes={{ paper: classes.popoverPaper }}
         onClose={handleClickAway}
       >
-        <List dense sx={classes.tabContainer}>
+        <List dense className={classes.tabContainer}>
           {notifications.length === 0 ? (
             <ListItem>
               <ListItemText>{i18n.t("notifications.noTickets")}</ListItemText>
@@ -218,7 +226,7 @@ const NotificationsPopOver = () => {
           ) : (
             notifications.map((ticket: any) => (
               <NotificationTicket key={ticket.id}>
-                <TicketListItem ticket={ticket} />
+                <TicketListItem ticket={ticket} ticketId={ticket.id} />
               </NotificationTicket>
             ))
           )}

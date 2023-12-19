@@ -1,6 +1,5 @@
-"use client";
 import { format, parseISO, startOfHour } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -11,15 +10,16 @@ import {
   YAxis,
 } from "recharts";
 
-import useTickets from "@/hooks/useTickets";
-import { useTheme } from "@emotion/react";
+import { i18n } from "../../translate/i18n";
+
+import { useTheme } from "@mui/material";
+import useTickets from "../../hooks/useTickets";
 import Title from "./Title";
 
 const Chart = () => {
-  const theme: any = useTheme();
+  const theme = useTheme();
 
   const date = useRef(new Date().toISOString());
-
   const { tickets } = useTickets({ date: date.current });
 
   const [chartData, setChartData] = useState([
@@ -39,7 +39,6 @@ const Chart = () => {
 
   useEffect(() => {
     setChartData((prevState) => {
-      ("");
       let aux = [...prevState];
 
       aux.forEach((a) => {
@@ -54,8 +53,10 @@ const Chart = () => {
   }, [tickets]);
 
   return (
-    <div style={{ width: "calc(100vw - 750px)", height: "300px", padding: 35 }}>
-      <Title>Tickets hoje:</Title>
+    <React.Fragment>
+      <Title>{`${i18n.t("dashboard.charts.perDay.title")}${
+        tickets.length
+      }`}</Title>
       <ResponsiveContainer>
         <BarChart
           data={chartData}
@@ -87,7 +88,7 @@ const Chart = () => {
           <Bar dataKey="amount" fill={theme.palette.primary.main} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </React.Fragment>
   );
 };
 

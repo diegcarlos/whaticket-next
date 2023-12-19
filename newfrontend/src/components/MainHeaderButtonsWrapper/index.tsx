@@ -4,6 +4,8 @@ interface Props {
   children: ReactNode;
 }
 const mainHeaderButtonsWrapper = {
+  display: "flex",
+  gap: 8,
   flex: "none",
   marginLeft: "auto",
 };

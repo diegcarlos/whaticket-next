@@ -3,7 +3,13 @@ import { useEffect, useRef, useState } from "react";
 
 const LS_NAME = "audioMessageRate";
 
-export default function ({ url }: any) {
+interface Props {
+  url: string;
+  id?: string;
+}
+
+export default function (props: Props) {
+  const { url, id } = props;
   const audioRef = useRef<HTMLAudioElement>({} as HTMLAudioElement);
   const [audioRate, setAudioRate]: any = useState(
     parseFloat(localStorage.getItem(LS_NAME) || "1")
@@ -53,7 +59,7 @@ export default function ({ url }: any) {
 
   return (
     <>
-      <audio ref={audioRef} controls>
+      <audio id={id} ref={audioRef} controls>
         <source src={url} type="audio/ogg"></source>
       </audio>
       {showButtonRate && (

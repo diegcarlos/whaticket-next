@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model contactcustomfields {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  value     String   @db.VarChar(255)
+  contactId Int
+  createdAt DateTime @db.DateTime(0)
+  updatedAt DateTime @db.DateTime(0)
+  contacts  contacts @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "contactcustomfields_ibfk_1")
+
+  @@index([contactId], map: "contactId")
+}
+
+model contacts {
+  id                  Int                   @id @default(autoincrement())
+  name                String                @db.VarChar(255)
+  number              String                @unique(map: "number") @db.VarChar(255)
+  profilePicUrl       String?               @db.VarChar(255)
+  createdAt           DateTime              @db.DateTime(0)
+  updatedAt           DateTime              @db.DateTime(0)
+  email               String                @default("") @db.VarChar(255)
+  isGroup             Boolean               @default(false)
+  contactcustomfields contactcustomfields[]
+  messages            messages[]
+  tickets             tickets[]
+}
+
+model messages {
+  id             String     @id @db.VarChar(255)
+  body           String     @db.Text
+  ack            Int        @default(0)
+  read           Boolean    @default(false)
+  mediaType      String?    @db.VarChar(255)
+  mediaUrl       String?    @db.VarChar(255)
+  ticketId       Int
+  createdAt      DateTime   @db.DateTime(6)
+  updatedAt      DateTime   @db.DateTime(6)
+  fromMe         Boolean    @default(false)
+  isDeleted      Boolean    @default(false)
+  contactId      Int?
+  quotedMsgId    String?    @db.VarChar(255)
+  contacts       contacts?  @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "Messages_contactId_foreign_idx")
+  messages       messages?  @relation("messagesTomessages", fields: [quotedMsgId], references: [id], map: "Messages_quotedMsgId_foreign_idx")
+  other_messages messages[] @relation("messagesTomessages")
+  tickets        tickets    @relation(fields: [ticketId], references: [id], onDelete: Cascade, map: "messages_ibfk_2")
+
+  @@index([contactId], map: "Messages_contactId_foreign_idx")
+  @@index([quotedMsgId], map: "Messages_quotedMsgId_foreign_idx")
+  @@index([ticketId], map: "ticketId")
+}
+
+model queues {
+  id              Int         @id @default(autoincrement())
+  name            String      @unique(map: "name") @db.VarChar(255)
+  color           String      @unique(map: "color") @db.VarChar(255)
+  greetingMessage String?     @db.Text
+  createdAt       DateTime    @db.DateTime(0)
+  updatedAt       DateTime    @db.DateTime(0)
+  idGroupQueue    Int?        @default(0)
+  queues          groupQueue? @relation(fields: [idGroupQueue], references: [id])
+  tickets         tickets[]
+}
+
+model quickanswers {
+  id        Int      @id @default(autoincrement())
+  shortcut  String   @db.Text
+  message   String   @db.Text
+  createdAt DateTime @db.DateTime(0)
+  updatedAt DateTime @db.DateTime(0)
+}
+
+model sequelizemeta {
+  name String @id @unique(map: "name") @db.VarChar(255)
+}
+
+model settings {
+  key       String   @id @db.VarChar(255)
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model tickets {
+  id             Int        @id @default(autoincrement())
+  status         String     @default("pending") @db.VarChar(255)
+  lastMessage    String?    @db.Text
+  contactId      Int?
+  userId         Int?
+  createdAt      DateTime   @db.DateTime(6)
+  updatedAt      DateTime   @db.DateTime(6)
+  whatsappId     Int?
+  isGroup        Boolean    @default(false)
+  unreadMessages Int?
+  queueId        Int?
+  messages       messages[]
+  queues         queues?    @relation(fields: [queueId], references: [id], map: "Tickets_queueId_foreign_idx")
+  whatsapps      whatsapps? @relation(fields: [whatsappId], references: [id], map: "Tickets_whatsappId_foreign_idx")
+  contacts       contacts?  @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "tickets_ibfk_1")
+  users          users?     @relation(fields: [userId], references: [id], map: "tickets_ibfk_2")
+
+  @@index([queueId], map: "Tickets_queueId_foreign_idx")
+  @@index([whatsappId], map: "Tickets_whatsappId_foreign_idx")
+  @@index([contactId], map: "contactId")
+  @@index([userId], map: "userId")
+}
+
+model userqueues {
+  userId    Int
+  queueId   Int
+  createdAt DateTime @db.DateTime(0)
+  updatedAt DateTime @db.DateTime(0)
+
+  @@id([userId, queueId])
+}
+
+model users {
+  id           Int        @id @default(autoincrement())
+  name         String     @db.VarChar(255)
+  email        String     @unique(map: "email") @db.VarChar(255)
+  passwordHash String     @db.VarChar(255)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  profile      String     @default("admin") @db.VarChar(255)
+  tokenVersion Int        @default(0)
+  whatsappId   Int?
+  tickets      tickets[]
+  whatsapps    whatsapps? @relation(fields: [whatsappId], references: [id], map: "Users_whatsappId_foreign_idx")
+
+  @@index([whatsappId], map: "Users_whatsappId_foreign_idx")
+}
+
+model whatsappqueues {
+  whatsappId Int
+  queueId    Int
+  createdAt  DateTime @db.DateTime(0)
+  updatedAt  DateTime @db.DateTime(0)
+
+  @@id([whatsappId, queueId])
+}
+
+model whatsapps {
+  id              Int       @id @default(autoincrement())
+  session         String?   @db.Text
+  qrcode          String?   @db.Text
+  status          String?   @db.VarChar(255)
+  battery         String?   @db.VarChar(255)
+  plugged         Boolean?
+  createdAt       DateTime  @db.DateTime(0)
+  updatedAt       DateTime  @db.DateTime(0)
+  name            String    @unique(map: "name") @db.VarChar(255)
+  isDefault       Boolean   @default(false)
+  retries         Int       @default(0)
+  greetingMessage String?   @db.Text
+  farewellMessage String?   @db.Text
+  tickets         tickets[]
+  users           users[]
+}
+
+model groupQueue {
+  id          Int      @id @default(autoincrement())
+  description String   @db.Text
+  main        Boolean
+  status      Boolean  @default(true)
+  createdAt   DateTime @db.DateTime(0)
+  updatedAt   DateTime @db.DateTime(0)
+  queues      queues[]
+}

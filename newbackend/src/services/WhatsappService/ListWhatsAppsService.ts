@@ -12,6 +12,8 @@ const ListWhatsAppsService = async (): Promise<WhatsAppSerialize[]> => {
   const prisma = new PrismaClient();
   const whatsapp = await prisma.whatsapps.findMany();
 
+  console.log(whatsapp);
+
   let whatsAppQueue: WhatsAppSerialize[] = [];
 
   for (let iw = 0; iw < whatsapp.length; iw += 1) {

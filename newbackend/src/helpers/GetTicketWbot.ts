@@ -1,16 +1,20 @@
+import { PrismaClient, tickets as Ticket } from "@prisma/client";
 import { Client as Session } from "whatsapp-web.js";
 import { getWbot } from "../libs/wbot";
 import GetDefaultWhatsApp from "./GetDefaultWhatsApp";
-import Ticket from "../models/Ticket";
 
+const prisma = new PrismaClient();
 const GetTicketWbot = async (ticket: Ticket): Promise<Session> => {
   if (!ticket.whatsappId) {
-    const defaultWhatsapp = await GetDefaultWhatsApp(ticket.user.id);
+    const defaultWhatsapp = await GetDefaultWhatsApp(ticket.userId as any);
 
-    await ticket.$set("whatsapp", defaultWhatsapp);
+    await prisma.whatsapps.update({
+      where: { id: ticket.whatsappId as any },
+      data: defaultWhatsapp,
+    });
   }
 
-  const wbot = getWbot(ticket.whatsappId);
+  const wbot = getWbot(ticket?.whatsappId as any);
 
   return wbot;
 };

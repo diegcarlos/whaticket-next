@@ -1,16 +1,18 @@
-import Whatsapp from "../../models/Whatsapp";
+import { PrismaClient } from "@prisma/client";
 import AppError from "../../errors/AppError";
 
-const DeleteWhatsAppService = async (id: string): Promise<void> => {
-  const whatsapp = await Whatsapp.findOne({
-    where: { id }
+const prisma = new PrismaClient();
+
+const DeleteWhatsAppService = async (id: number): Promise<void> => {
+  const whatsapp = await prisma.whatsapps.findFirst({
+    where: { id },
   });
 
   if (!whatsapp) {
     throw new AppError("ERR_NO_WAPP_FOUND", 404);
   }
 
-  await whatsapp.destroy();
+  await prisma.whatsapps.delete({ where: { id } });
 };
 
 export default DeleteWhatsAppService;

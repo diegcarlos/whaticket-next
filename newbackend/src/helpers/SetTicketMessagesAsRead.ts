@@ -1,26 +1,31 @@
+import { PrismaClient, tickets as Ticket } from "@prisma/client";
 import { getIO } from "../libs/socket";
-import Message from "../models/Message";
-import Ticket from "../models/Ticket";
-import { logger } from "../utils/logger";
+import { logger } from "../util/logger";
 import GetTicketWbot from "./GetTicketWbot";
 
-const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
-  await Message.update(
-    { read: true },
-    {
-      where: {
-        ticketId: ticket.id,
-        read: false
-      }
-    }
-  );
+const prisma = new PrismaClient();
 
-  await ticket.update({ unreadMessages: 0 });
+const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
+  await prisma.messages.updateMany({
+    where: {
+      ticketId: ticket.id,
+      read: false,
+    },
+    data: {
+      read: true,
+    },
+  });
+
+  const tickets = await prisma.tickets.update({
+    where: { id: ticket.id },
+    data: { unreadMessages: 0 },
+    include: { contacts: true },
+  });
 
   try {
     const wbot = await GetTicketWbot(ticket);
     await wbot.sendSeen(
-      `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`
+      `${tickets.contacts?.number}@${ticket.isGroup ? "g" : "c"}.us`
     );
   } catch (err) {
     logger.warn(
@@ -31,7 +36,7 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
   const io = getIO();
   io.to(ticket.status).to("notification").emit("ticket", {
     action: "updateUnread",
-    ticketId: ticket.id
+    ticketId: ticket.id,
   });
 };
 

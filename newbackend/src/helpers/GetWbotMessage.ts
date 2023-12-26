@@ -1,16 +1,23 @@
 import { Message as WbotMessage } from "whatsapp-web.js";
-import Ticket from "../models/Ticket";
-import GetTicketWbot from "./GetTicketWbot";
 import AppError from "../errors/AppError";
+import GetTicketWbot from "./GetTicketWbot";
+
+import { contacts as Contact, tickets as Ticket } from "@prisma/client";
+
+interface TicketContact {
+  contacts: Contact;
+}
+
+type FullTicket = Ticket & TicketContact;
 
 export const GetWbotMessage = async (
-  ticket: Ticket,
+  ticket: FullTicket,
   messageId: string
 ): Promise<WbotMessage> => {
   const wbot = await GetTicketWbot(ticket);
 
   const wbotChat = await wbot.getChatById(
-    `${ticket.contact.number}@${ticket.isGroup ? "g" : "c"}.us`
+    `${ticket.contacts.number}@${ticket.isGroup ? "g" : "c"}.us`
   );
 
   let limit = 20;
@@ -18,7 +25,7 @@ export const GetWbotMessage = async (
   const fetchWbotMessagesGradually = async (): Promise<void | WbotMessage> => {
     const chatMessages = await wbotChat.fetchMessages({ limit });
 
-    const msgFound = chatMessages.find(msg => msg.id.id === messageId);
+    const msgFound = chatMessages.find((msg) => msg.id.id === messageId);
 
     if (!msgFound && limit < 100) {
       limit += 20;

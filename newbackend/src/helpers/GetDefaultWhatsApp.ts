@@ -1,19 +1,19 @@
+import { PrismaClient, whatsapps as Whatsapp } from "@prisma/client";
 import AppError from "../errors/AppError";
-import Whatsapp from "../models/Whatsapp";
 import GetDefaultWhatsAppByUser from "./GetDefaultWhatsAppByUser";
 
-const GetDefaultWhatsApp = async (
-  userId?: number
-): Promise<Whatsapp> => {
-  if(userId) {
+const prisma = new PrismaClient();
+
+const GetDefaultWhatsApp = async (userId?: number): Promise<Whatsapp> => {
+  if (userId) {
     const whatsappByUser = await GetDefaultWhatsAppByUser(userId);
-    if(whatsappByUser !== null) {
+    if (whatsappByUser !== null) {
       return whatsappByUser;
     }
   }
 
-  const defaultWhatsapp = await Whatsapp.findOne({
-    where: { isDefault: true }
+  const defaultWhatsapp = await prisma.whatsapps.findFirst({
+    where: { isDefault: true },
   });
 
   if (!defaultWhatsapp) {

@@ -1,10 +1,9 @@
 import * as Yup from "yup";
-import { Op } from "sequelize";
 
+import { PrismaClient, whatsapps as Whatsapp } from "@prisma/client";
 import AppError from "../../errors/AppError";
-import Whatsapp from "../../models/Whatsapp";
-import ShowWhatsAppService from "./ShowWhatsAppService";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
+import ShowWhatsAppService from "./ShowWhatsAppService";
 
 interface WhatsappData {
   name?: string;
@@ -26,14 +25,16 @@ interface Response {
   oldDefaultWhatsapp: Whatsapp | null;
 }
 
+const prisma = new PrismaClient();
+
 const UpdateWhatsAppService = async ({
   whatsappData,
-  whatsappId
+  whatsappId,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
     status: Yup.string(),
-    isDefault: Yup.boolean()
+    isDefault: Yup.boolean(),
   });
 
   const {
@@ -43,12 +44,12 @@ const UpdateWhatsAppService = async ({
     session,
     greetingMessage,
     farewellMessage,
-    queueIds = []
+    queueIds = [],
   } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
@@ -59,23 +60,29 @@ const UpdateWhatsAppService = async ({
   let oldDefaultWhatsapp: Whatsapp | null = null;
 
   if (isDefault) {
-    oldDefaultWhatsapp = await Whatsapp.findOne({
-      where: { isDefault: true, id: { [Op.not]: whatsappId } }
+    oldDefaultWhatsapp = await prisma.whatsapps.findFirst({
+      where: { isDefault: true, id: { not: Number(whatsappId) } },
     });
     if (oldDefaultWhatsapp) {
-      await oldDefaultWhatsapp.update({ isDefault: false });
+      await prisma.whatsapps.update({
+        data: { isDefault: false },
+        where: { id: oldDefaultWhatsapp.id },
+      });
     }
   }
 
   const whatsapp = await ShowWhatsAppService(whatsappId);
 
-  await whatsapp.update({
-    name,
-    status,
-    session,
-    greetingMessage,
-    farewellMessage,
-    isDefault
+  await prisma.whatsapps.update({
+    where: { id: whatsapp.id },
+    data: {
+      name,
+      status,
+      session,
+      greetingMessage,
+      farewellMessage,
+      isDefault,
+    },
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);

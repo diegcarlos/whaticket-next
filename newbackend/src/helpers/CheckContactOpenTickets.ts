@@ -1,13 +1,18 @@
-import { Op } from "sequelize";
+import { PrismaClient } from "@prisma/client";
 import AppError from "../errors/AppError";
-import Ticket from "../models/Ticket";
+
+const prisma = new PrismaClient();
 
 const CheckContactOpenTickets = async (
   contactId: number,
   whatsappId: number
 ): Promise<void> => {
-  const ticket = await Ticket.findOne({
-    where: { contactId, whatsappId, status: { [Op.or]: ["open", "pending"] } }
+  const ticket = await prisma.tickets.findFirst({
+    where: {
+      contactId,
+      whatsappId,
+      OR: [{ status: "open" }, { status: "pending" }],
+    },
   });
 
   if (ticket) {

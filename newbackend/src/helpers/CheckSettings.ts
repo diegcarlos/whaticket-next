@@ -1,9 +1,11 @@
-import Setting from "../models/Setting";
+import { PrismaClient } from "@prisma/client";
 import AppError from "../errors/AppError";
 
+const prisma = new PrismaClient();
+
 const CheckSettings = async (key: string): Promise<string> => {
-  const setting = await Setting.findOne({
-    where: { key }
+  const setting = await prisma.settings.findFirst({
+    where: { key },
   });
 
   if (!setting) {

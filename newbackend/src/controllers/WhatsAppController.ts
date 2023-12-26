@@ -38,7 +38,7 @@ export const store = async (
     greetingMessage,
     farewellMessage,
     queueIds,
-  }: WhatsappData = req.body;
+  }: WhatsappData = req.body as any;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
     name,
@@ -71,7 +71,7 @@ export const show = async (
   req: FastifyRequest,
   resply: FastifyReply
 ): Promise<FastifyReply> => {
-  const { whatsappId } = req.params;
+  const { whatsappId }: any = req.params;
 
   const whatsapp = await ShowWhatsAppService(whatsappId);
 
@@ -82,8 +82,8 @@ export const update = async (
   req: FastifyRequest,
   resply: FastifyReply
 ): Promise<FastifyReply> => {
-  const { whatsappId } = req.params;
-  const whatsappData = req.body;
+  const { whatsappId }: any = req.params;
+  const whatsappData: any = req.body;
 
   const { whatsapp, oldDefaultWhatsapp } = await UpdateWhatsAppService({
     whatsappData,
@@ -110,7 +110,7 @@ export const remove = async (
   req: FastifyRequest,
   resply: FastifyReply
 ): Promise<FastifyReply> => {
-  const { whatsappId } = req.params;
+  const { whatsappId }: any = req.params;
 
   await DeleteWhatsAppService(whatsappId);
   removeWbot(+whatsappId);

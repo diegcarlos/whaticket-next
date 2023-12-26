@@ -1,17 +1,18 @@
-import Whatsapp from "../../models/Whatsapp";
 import AppError from "../../errors/AppError";
-import Queue from "../../models/Queue";
+
+import { PrismaClient, whatsapps as Whatsapp } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
-  const whatsapp = await Whatsapp.findByPk(id, {
-    include: [
-      {
-        model: Queue,
-        as: "queues",
-        attributes: ["id", "name", "color", "greetingMessage"]
-      }
-    ],
-    order: [["queues", "name", "ASC"]]
+  const whatsapp = await prisma.whatsapps.findUnique({
+    where: { id: Number(id) },
+    include: {
+      queues: {
+        select: { id: true, name: true, color: true, greetingMessage: true },
+        orderBy: { name: "asc" },
+      },
+    },
   });
 
   if (!whatsapp) {

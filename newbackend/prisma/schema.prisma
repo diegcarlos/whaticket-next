@@ -12,25 +12,25 @@ model contactcustomfields {
   name      String   @db.VarChar(255)
   value     String   @db.VarChar(255)
   contactId Int
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   contacts  contacts @relation(fields: [contactId], references: [id], onDelete: Cascade, map: "contactcustomfields_ibfk_1")
 
   @@index([contactId], map: "contactId")
 }
 
 model contacts {
-  id                  Int                   @id @default(autoincrement())
-  name                String                @db.VarChar(255)
-  number              String                @unique(map: "number") @db.VarChar(255)
-  profilePicUrl       String?               @db.VarChar(255)
-  createdAt           DateTime              @db.DateTime(0)
-  updatedAt           DateTime              @db.DateTime(0)
-  email               String                @default("") @db.VarChar(255)
-  isGroup             Boolean               @default(false)
-  contactcustomfields contactcustomfields[]
-  messages            messages[]
-  tickets             tickets[]
+  id            Int                   @id @default(autoincrement())
+  name          String                @db.VarChar(255)
+  number        String                @unique(map: "number") @db.VarChar(255)
+  profilePicUrl String?               @db.VarChar(255)
+  createdAt     DateTime?             @default(now())
+  updatedAt     DateTime?             @updatedAt
+  email         String                @default("") @db.VarChar(255)
+  isGroup       Boolean               @default(false)
+  extraInfo     contactcustomfields[]
+  messages      messages[]
+  tickets       tickets[]
 }
 
 model messages {
@@ -41,8 +41,8 @@ model messages {
   mediaType      String?    @db.VarChar(255)
   mediaUrl       String?    @db.VarChar(255)
   ticketId       Int
-  createdAt      DateTime   @db.DateTime(6)
-  updatedAt      DateTime   @db.DateTime(6)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   fromMe         Boolean    @default(false)
   isDeleted      Boolean    @default(false)
   contactId      Int?
@@ -58,24 +58,28 @@ model messages {
 }
 
 model queues {
-  id              Int       @id @default(autoincrement())
-  name            String    @unique(map: "name") @db.VarChar(255)
-  color           String    @unique(map: "color") @db.VarChar(255)
-  greetingMessage String?   @db.Text
-  createdAt       DateTime  @db.DateTime(0)
-  updatedAt       DateTime  @updatedAt @db.DateTime(0)
-  idGroupQueue    Int?      @default(0)
+  id              Int        @id @default(autoincrement())
+  name            String     @unique(map: "name") @db.VarChar(255)
+  color           String     @unique(map: "color") @db.VarChar(255)
+  greetingMessage String?    @db.Text
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  idGroupQueue    Int?       @default(0)
   tickets         tickets[]
+  whatsapps       whatsapps? @relation(fields: [whatsappsId], references: [id])
+  whatsappsId     Int?
+  users           users?     @relation(fields: [usersId], references: [id])
+  usersId         Int?
 
   @@index([idGroupQueue], map: "queues_idGroupQueue_fkey")
 }
 
 model quickanswers {
-  id        Int      @id @default(autoincrement())
-  shortcut  String   @db.Text
-  message   String   @db.Text
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
+  id        Int       @id @default(autoincrement())
+  shortcut  String    @db.Text
+  message   String    @db.Text
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model sequelizemeta {
@@ -95,8 +99,8 @@ model tickets {
   lastMessage    String?    @db.Text
   contactId      Int?
   userId         Int?
-  createdAt      DateTime   @db.DateTime(6)
-  updatedAt      DateTime   @db.DateTime(6)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   whatsappId     Int?
   isGroup        Boolean    @default(false)
   unreadMessages Int?
@@ -133,6 +137,7 @@ model users {
   tokenVersion Int        @default(0)
   whatsappId   Int?
   tickets      tickets[]
+  queues       queues[]
   whatsapps    whatsapps? @relation(fields: [whatsappId], references: [id], map: "Users_whatsappId_foreign_idx")
 
   @@index([whatsappId], map: "Users_whatsappId_foreign_idx")
@@ -152,10 +157,10 @@ model whatsapps {
   session         String?   @db.Text
   qrcode          String?   @db.Text
   status          String?   @db.VarChar(255)
-  battery         String?   @db.VarChar(255)
+  battery         Int?
   plugged         Boolean?
-  createdAt       DateTime  @db.DateTime(0)
-  updatedAt       DateTime  @db.DateTime(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   name            String    @unique(map: "name") @db.VarChar(255)
   isDefault       Boolean   @default(false)
   retries         Int       @default(0)
@@ -163,6 +168,7 @@ model whatsapps {
   farewellMessage String?   @db.Text
   tickets         tickets[]
   users           users[]
+  queues          queues[]
 }
 
 model groupqueue {

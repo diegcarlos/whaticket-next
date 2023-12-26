@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
+import { PrismaClient, whatsapps as Whatsapp } from "@prisma/client";
 import AppError from "../../errors/AppError";
-import Whatsapp from "../../models/Whatsapp";
 import AssociateWhatsappQueue from "./AssociateWhatsappQueue";
 
 interface Request {
@@ -18,13 +18,15 @@ interface Response {
   oldDefaultWhatsapp: Whatsapp | null;
 }
 
+const prisma = new PrismaClient();
+
 const CreateWhatsAppService = async ({
   name,
   status = "OPENING",
   queueIds = [],
   greetingMessage,
   farewellMessage,
-  isDefault = false
+  isDefault = false,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -33,35 +35,38 @@ const CreateWhatsAppService = async ({
       .test(
         "Check-name",
         "This whatsapp name is already used.",
-        async value => {
+        async (value) => {
           if (!value) return false;
-          const nameExists = await Whatsapp.findOne({
-            where: { name: value }
+          const nameExists = await prisma.whatsapps.findFirst({
+            where: { name: value },
           });
           return !nameExists;
         }
       ),
-    isDefault: Yup.boolean().required()
+    isDefault: Yup.boolean().required(),
   });
 
   try {
     await schema.validate({ name, status, isDefault });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
-  const whatsappFound = await Whatsapp.findOne();
+  const whatsappFound = await prisma.whatsapps.findFirst();
 
   isDefault = !whatsappFound;
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
 
   if (isDefault) {
-    oldDefaultWhatsapp = await Whatsapp.findOne({
-      where: { isDefault: true }
+    oldDefaultWhatsapp = await prisma.whatsapps.findFirst({
+      where: { isDefault: true },
     });
     if (oldDefaultWhatsapp) {
-      await oldDefaultWhatsapp.update({ isDefault: false });
+      await prisma.whatsapps.update({
+        data: { isDefault: false },
+        where: { id: oldDefaultWhatsapp.id },
+      });
     }
   }
 
@@ -69,16 +74,10 @@ const CreateWhatsAppService = async ({
     throw new AppError("ERR_WAPP_GREETING_REQUIRED");
   }
 
-  const whatsapp = await Whatsapp.create(
-    {
-      name,
-      status,
-      greetingMessage,
-      farewellMessage,
-      isDefault
-    },
-    { include: ["queues"] }
-  );
+  const whatsapp = await prisma.whatsapps.create({
+    data: { name, status, greetingMessage, farewellMessage, isDefault },
+    include: { queues: true },
+  });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
 

@@ -1,27 +1,49 @@
-import express from "express";
+import { FastifyInstance } from "fastify";
+import * as ContactController from "../controllers/ContactController";
 import isAuth from "../middleware/isAuth";
 
-import * as ContactController from "../controllers/ContactController";
-import * as ImportPhoneContactsController from "../controllers/ImportPhoneContactsController";
+const contactRoutes = async function (fastify: FastifyInstance, opts: any) {
+  fastify.route({
+    method: "GET",
+    url: "/contacts",
+    handler: ContactController.index,
+    preHandler: isAuth,
+  });
 
-const contactRoutes = express.Router();
+  fastify.route({
+    method: "POST",
+    url: "/contacts",
+    handler: ContactController.store,
+    preHandler: isAuth,
+  });
 
-contactRoutes.post(
-  "/contacts/import",
-  isAuth,
-  ImportPhoneContactsController.store
-);
+  fastify.route({
+    method: "POST",
+    url: "/contact",
+    handler: ContactController.getContact,
+    preHandler: isAuth,
+  });
 
-contactRoutes.get("/contacts", isAuth, ContactController.index);
+  fastify.route({
+    method: "GET",
+    url: "/contacts/:contactsId",
+    handler: ContactController.show,
+    preHandler: isAuth,
+  });
 
-contactRoutes.get("/contacts/:contactId", isAuth, ContactController.show);
+  fastify.route({
+    method: "PUT",
+    url: "/contacts/:contactsId",
+    handler: ContactController.update,
+    preHandler: isAuth,
+  });
 
-contactRoutes.post("/contacts", isAuth, ContactController.store);
-
-contactRoutes.post("/contact", isAuth, ContactController.getContact);
-
-contactRoutes.put("/contacts/:contactId", isAuth, ContactController.update);
-
-contactRoutes.delete("/contacts/:contactId", isAuth, ContactController.remove);
+  fastify.route({
+    method: "DELETE",
+    url: "/contacts/:contactsId",
+    handler: ContactController.remove,
+    preHandler: isAuth,
+  });
+};
 
 export default contactRoutes;

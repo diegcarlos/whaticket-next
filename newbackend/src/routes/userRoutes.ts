@@ -1,18 +1,42 @@
-import { Router } from "express";
-
-import isAuth from "../middleware/isAuth";
+import { FastifyInstance } from "fastify";
 import * as UserController from "../controllers/UserController";
+import isAuth from "../middleware/isAuth";
 
-const userRoutes = Router();
+const userRoutes = async function (fastify: FastifyInstance, opts: any) {
+  fastify.route({
+    method: "GET",
+    url: "/users",
+    handler: UserController.index,
+    preHandler: isAuth,
+  });
 
-userRoutes.get("/users", isAuth, UserController.index);
+  fastify.route({
+    method: "POST",
+    url: "/users",
+    handler: UserController.store,
+    preHandler: isAuth,
+  });
 
-userRoutes.post("/users", isAuth, UserController.store);
+  fastify.route({
+    method: "GET",
+    url: "/users/:usersId",
+    handler: UserController.show,
+    preHandler: isAuth,
+  });
 
-userRoutes.put("/users/:userId", isAuth, UserController.update);
+  fastify.route({
+    method: "PUT",
+    url: "/users/:usersId",
+    handler: UserController.update,
+    preHandler: isAuth,
+  });
 
-userRoutes.get("/users/:userId", isAuth, UserController.show);
-
-userRoutes.delete("/users/:userId", isAuth, UserController.remove);
+  fastify.route({
+    method: "DELETE",
+    url: "/users/:usersId",
+    handler: UserController.remove,
+    preHandler: isAuth,
+  });
+};
 
 export default userRoutes;

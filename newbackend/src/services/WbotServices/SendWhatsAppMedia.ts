@@ -1,4 +1,8 @@
-import { PrismaClient, tickets as Ticket } from "@prisma/client";
+import {
+  contacts as Contact,
+  PrismaClient,
+  tickets as Ticket,
+} from "@prisma/client";
 import fs from "fs";
 import {
   MessageMedia,
@@ -8,10 +12,11 @@ import {
 import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 
+import { SavedMultipartFile } from "@fastify/multipart";
 import formatBody from "../../helpers/Mustache";
 
 interface Request {
-  media: any;
+  media: SavedMultipartFile;
   ticket: Ticket;
   body?: string;
 }
@@ -29,9 +34,11 @@ const SendWhatsAppMedia = async ({
       //@ts-ignore
       where: { id: ticket.userId },
     });
-    const hasBody = body ? formatBody(body as string, contact) : undefined;
+    const hasBody = body
+      ? formatBody(body as string, contact as Contact)
+      : undefined;
 
-    const newMedia = MessageMedia.fromFilePath(media.path);
+    const newMedia = MessageMedia.fromFilePath(media.filepath);
 
     let mediaOptions: MessageSendOptions = {
       caption: hasBody,
@@ -56,7 +63,7 @@ const SendWhatsAppMedia = async ({
       data: { lastMessage: body || media.filename },
     });
 
-    fs.unlinkSync(media.path);
+    fs.unlinkSync(media.filepath);
 
     return sentMessage;
   } catch (err) {

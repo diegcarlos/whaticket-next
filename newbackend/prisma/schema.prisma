@@ -120,8 +120,8 @@ model tickets {
 model userqueues {
   userId    Int
   queueId   Int
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@id([userId, queueId])
 }

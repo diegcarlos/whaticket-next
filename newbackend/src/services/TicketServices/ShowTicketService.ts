@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const ShowTicketService = async (id: number): Promise<Ticket> => {
   const ticket = await prisma.tickets.findUnique({
-    where: { id },
+    where: { id: Number(id) },
     include: {
       contacts: {
         select: {

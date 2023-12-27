@@ -1,17 +1,17 @@
+import { users as User } from "@prisma/client";
+import { FastifyReply as Res } from "fastify";
 import { verify } from "jsonwebtoken";
-import { Response as Res } from "express";
+import ShowUserService from "../UserService/ShowUserService";
 
-import User from "../../models/User";
-import AppError from "../../errors/AppError";
-import ShowUserService from "../UserServices/ShowUserService";
 import authConfig from "../../config/auth";
+import AppError from "../../errors/AppError";
 import {
   createAccessToken,
-  createRefreshToken
+  createRefreshToken,
 } from "../../helpers/CreateTokens";
 
 interface RefreshTokenPayload {
-  id: string;
+  id: number;
   tokenVersion: number;
 }
 
@@ -29,15 +29,15 @@ export const RefreshTokenService = async (
     const decoded = verify(token, authConfig.refreshSecret);
     const { id, tokenVersion } = decoded as RefreshTokenPayload;
 
-    const user = await ShowUserService(id);
+    const user = (await ShowUserService(id)) as any;
 
     if (user.tokenVersion !== tokenVersion) {
       res.clearCookie("jrt");
       throw new AppError("ERR_SESSION_EXPIRED", 401);
     }
 
-    const newToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
+    const newToken = createAccessToken(user as any);
+    const refreshToken = createRefreshToken(user as any);
 
     return { user, newToken, refreshToken };
   } catch (err) {

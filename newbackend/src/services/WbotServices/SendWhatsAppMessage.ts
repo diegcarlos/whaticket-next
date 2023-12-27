@@ -5,6 +5,7 @@ import GetWbotMessage from "../../helpers/GetWbotMessage";
 import SerializeWbotMsgId from "../../helpers/SerializeWbotMsgId";
 
 import {
+  contacts as Contact,
   messages as Message,
   PrismaClient,
   tickets as Ticket,
@@ -12,9 +13,15 @@ import {
 
 import formatBody from "../../helpers/Mustache";
 
+interface TicketContacts {
+  contacts: Contact;
+}
+
+type FullTicket = Ticket & TicketContacts;
+
 interface Request {
   body: string;
-  ticket: Ticket;
+  ticket: FullTicket;
   quotedMsg?: Message;
 }
 
@@ -40,7 +47,7 @@ const SendWhatsAppMessage = async ({
     });
     const sentMessage = await wbot.sendMessage(
       `${contact?.number}@${ticket.isGroup ? "g" : "c"}.us`,
-      formatBody(body, contact),
+      formatBody(body, contact as any),
       {
         quotedMessageId: quotedMsgSerializedId,
         linkPreview: false,

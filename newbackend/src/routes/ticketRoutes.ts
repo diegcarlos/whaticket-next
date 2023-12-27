@@ -1,18 +1,42 @@
-import express from "express";
+import { FastifyInstance } from "fastify";
+import * as TicketController from "../controllers/TicketController";
 import isAuth from "../middleware/isAuth";
 
-import * as TicketController from "../controllers/TicketController";
+const ticketRoutes = async function (fastify: FastifyInstance, opts: any) {
+  fastify.route({
+    method: "GET",
+    url: "/tickets",
+    handler: TicketController.index,
+    preHandler: isAuth,
+  });
 
-const ticketRoutes = express.Router();
+  fastify.route({
+    method: "POST",
+    url: "/tickets",
+    handler: TicketController.store,
+    preHandler: isAuth,
+  });
 
-ticketRoutes.get("/tickets", isAuth, TicketController.index);
+  fastify.route({
+    method: "GET",
+    url: "/tickets/:ticketsId",
+    handler: TicketController.show,
+    preHandler: isAuth,
+  });
 
-ticketRoutes.get("/tickets/:ticketId", isAuth, TicketController.show);
+  fastify.route({
+    method: "PUT",
+    url: "/tickets/:ticketsId",
+    handler: TicketController.update,
+    preHandler: isAuth,
+  });
 
-ticketRoutes.post("/tickets", isAuth, TicketController.store);
-
-ticketRoutes.put("/tickets/:ticketId", isAuth, TicketController.update);
-
-ticketRoutes.delete("/tickets/:ticketId", isAuth, TicketController.remove);
+  fastify.route({
+    method: "DELETE",
+    url: "/tickets/:ticketsId",
+    handler: TicketController.remove,
+    preHandler: isAuth,
+  });
+};
 
 export default ticketRoutes;

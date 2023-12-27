@@ -4,7 +4,7 @@ import { PrismaClient, whatsapps as Whatsapp } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const ShowWhatsAppService = async (id: string | number): Promise<Whatsapp> => {
+const ShowWhatsAppService = async (id: number): Promise<Whatsapp> => {
   const whatsapp = await prisma.whatsapps.findUnique({
     where: { id: Number(id) },
     include: {

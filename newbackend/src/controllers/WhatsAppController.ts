@@ -73,7 +73,7 @@ export const show = async (
 ): Promise<FastifyReply> => {
   const { whatsappId }: any = req.params;
 
-  const whatsapp = await ShowWhatsAppService(whatsappId);
+  const whatsapp = await ShowWhatsAppService(Number(whatsappId));
 
   return resply.send(whatsapp);
 };
@@ -112,7 +112,7 @@ export const remove = async (
 ): Promise<FastifyReply> => {
   const { whatsappId }: any = req.params;
 
-  await DeleteWhatsAppService(whatsappId);
+  await DeleteWhatsAppService(Number(whatsappId));
   removeWbot(+whatsappId);
 
   const io = getIO();

@@ -37,8 +37,11 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId }: any = req.params;
-  const { body, quotedMsg }: MessageData = req.body as MessageData;
+  const file: any = await req.file();
+
   const medias = await req.saveRequestFiles();
+
+  console.log(file?.fields);
 
   const ticket = await ShowTicketService(Number(ticketId));
 
@@ -51,7 +54,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
       })
     );
   } else {
-    await SendWhatsAppMessage({ body, ticket, quotedMsg });
+    await SendWhatsAppMessage({
+      body: file?.fields.body.value,
+      ticket,
+      quotedMsg: file?.fields.quotedMsg.value,
+    } as any);
   }
 
   return res.send();

@@ -104,7 +104,7 @@ const Users = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchUsers = async () => {
         try {
-          const { data } = await api.get("/users/", {
+          const { data } = await api.get("/users", {
             params: { searchParam, pageNumber },
           });
           dispatch({ type: "LOAD_USERS", payload: data.users });

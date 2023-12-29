@@ -111,7 +111,7 @@ const QuickAnswers = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchQuickAnswers = async () => {
         try {
-          const { data } = await api.get("/quickAnswers/", {
+          const { data } = await api.get("/quickAnswers", {
             params: { searchParam, pageNumber },
           });
           dispatch({ type: "LOAD_QUICK_ANSWERS", payload: data.quickAnswers });

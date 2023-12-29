@@ -26,21 +26,21 @@ const contactRoutes = async function (fastify: FastifyInstance, opts: any) {
 
   fastify.route({
     method: "GET",
-    url: "/contacts/:contactsId",
+    url: "/contacts/:contactId",
     handler: ContactController.show,
     preHandler: isAuth,
   });
 
   fastify.route({
     method: "PUT",
-    url: "/contacts/:contactsId",
+    url: "/contacts/:contactId",
     handler: ContactController.update,
     preHandler: isAuth,
   });
 
   fastify.route({
     method: "DELETE",
-    url: "/contacts/:contactsId",
+    url: "/contacts/:contactId",
     handler: ContactController.remove,
     preHandler: isAuth,
   });

@@ -1,4 +1,6 @@
-import { PrismaClient, tickets as Ticket } from "@prisma/client";
+import { Prisma, PrismaClient, tickets as Ticket } from "@prisma/client";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
+import ShowUserService from "../UserService/ShowUserService";
 
 interface Request {
   searchParam?: string;
@@ -8,7 +10,7 @@ interface Request {
   showAll?: string;
   userId: number;
   withUnreadMessages?: string;
-  queueIds: number[];
+  queueIds: number[] | null;
 }
 
 interface Response {
@@ -22,131 +24,114 @@ const prisma = new PrismaClient();
 const ListTicketsService = async ({
   searchParam = "",
   pageNumber = "1",
-  queueIds,
+  queueIds = [],
   status,
   date,
   showAll,
   userId,
   withUnreadMessages,
 }: Request): Promise<Response> => {
-  // let whereCondition: Filterable["where"] = {
-  //   [Op.or]: [{ userId }, { status: "pending" }],
-  //   queueId: { [Op.or]: [queueIds, null] },
-  // };
+  let whereCondition: Prisma.ticketsFindManyArgs["where"] = {
+    OR: [
+      { userId },
+      { status: "pending" },
+      { queueId: { in: queueIds } },
+      { queueId: null },
+    ],
+  };
 
-  // prisma.tickets.findMany({
-  //   where: { OR: [{ userId }, { status: "pending" }] },
-  //   include: { queues: { where: { OR: [queueIds, null] } } },
-  // });
+  let includeCondition: Prisma.ticketsFindManyArgs["include"];
 
-  // let includeCondition: Includeable[];
+  includeCondition = {
+    contacts: { select: { id: true, name: true, profilePicUrl: true } },
+    queues: { select: { id: true, name: true, color: true } },
+    whatsapps: { select: { name: true } },
+  };
 
-  // includeCondition = [
-  //   {
-  //     model: Contact,
-  //     as: "contact",
-  //     attributes: ["id", "name", "number", "profilePicUrl"],
-  //   },
-  //   {
-  //     model: Queue,
-  //     as: "queue",
-  //     attributes: ["id", "name", "color"],
-  //   },
-  //   {
-  //     model: Whatsapp,
-  //     as: "whatsapp",
-  //     attributes: ["name"],
-  //   },
-  // ];
+  if (showAll === "true") {
+    whereCondition = { OR: [{ queueId: { in: queueIds } }, { queueId: null }] };
+  }
 
-  // if (showAll === "true") {
-  //   whereCondition = { queueId: { [Op.or]: [queueIds, null] } };
-  // }
+  if (status) {
+    whereCondition = {
+      ...whereCondition,
+      status,
+    };
+  }
 
-  // if (status) {
-  //   whereCondition = {
-  //     ...whereCondition,
-  //     status,
-  //   };
-  // }
+  if (searchParam) {
+    const sanitizedSearchParam = searchParam.toLocaleLowerCase().trim();
 
-  // if (searchParam) {
-  //   const sanitizedSearchParam = searchParam.toLocaleLowerCase().trim();
+    includeCondition = {
+      ...includeCondition,
+      messages: {
+        where: { body: { contains: sanitizedSearchParam } },
+        select: { id: true, body: true },
+      },
+    };
 
-  //   includeCondition = [
-  //     ...includeCondition,
-  //     {
-  //       model: Message,
-  //       as: "messages",
-  //       attributes: ["id", "body"],
-  //       where: {
-  //         body: where(
-  //           fn("LOWER", col("body")),
-  //           "LIKE",
-  //           `%${sanitizedSearchParam}%`
-  //         ),
-  //       },
-  //       required: false,
-  //       duplicating: false,
-  //     },
-  //   ];
+    whereCondition = {
+      ...whereCondition,
+      OR: [
+        {
+          contacts: {
+            name: {
+              contains: sanitizedSearchParam.toLowerCase(),
+            },
+          },
+        },
+        {
+          contacts: {
+            number: {
+              contains: sanitizedSearchParam,
+            },
+          },
+        },
+        {
+          messages: {
+            some: {
+              body: {
+                contains: sanitizedSearchParam.toLowerCase(),
+              },
+            },
+          },
+        },
+      ],
+    };
+  }
 
-  //   whereCondition = {
-  //     ...whereCondition,
-  //     [Op.or]: [
-  //       {
-  //         "$contact.name$": where(
-  //           fn("LOWER", col("contact.name")),
-  //           "LIKE",
-  //           `%${sanitizedSearchParam}%`
-  //         ),
-  //       },
-  //       { "$contact.number$": { [Op.like]: `%${sanitizedSearchParam}%` } },
-  //       {
-  //         "$message.body$": where(
-  //           fn("LOWER", col("body")),
-  //           "LIKE",
-  //           `%${sanitizedSearchParam}%`
-  //         ),
-  //       },
-  //     ],
-  //   };
-  // }
+  if (date) {
+    whereCondition = {
+      createdAt: {
+        gte: new Date(startOfDay(parseISO(date))),
+        lte: new Date(endOfDay(parseISO(date))),
+      },
+    };
+  }
 
-  // if (date) {
-  //   whereCondition = {
-  //     createdAt: {
-  //       [Op.between]: [+startOfDay(parseISO(date)), +endOfDay(parseISO(date))],
-  //     },
-  //   };
-  // }
+  if (withUnreadMessages === "true") {
+    const user = await ShowUserService(userId);
+    const userQueueIds = user.queues.map((queue) => queue.id);
 
-  // if (withUnreadMessages === "true") {
-  //   const user = await ShowUserService(userId);
-  //   const userQueueIds = user.queues.map((queue) => queue.id);
-
-  //   whereCondition = {
-  //     [Op.or]: [{ userId }, { status: "pending" }],
-  //     queueId: { [Op.or]: [userQueueIds, null] },
-  //     unreadMessages: { [Op.gt]: 0 },
-  //   };
-  // }
+    whereCondition = {
+      OR: [
+        { userId },
+        { status: "pending" },
+        { queueId: { in: userQueueIds } },
+        { queueId: null },
+      ],
+      unreadMessages: { gt: 0 },
+    };
+  }
 
   const limit = 40;
   const offset = limit * (+pageNumber - 1);
 
-  // const { count, rows: tickets } = await Ticket.findAndCountAll({
-  //   where: whereCondition,
-  //   include: includeCondition,
-  //   distinct: true,
-  //   limit,
-  //   offset,
-  //   order: [["updatedAt", "DESC"]],
-  // });
-
   const count = await prisma.tickets.count();
 
   const rows = await prisma.tickets.findMany({
+    where: whereCondition,
+    include: includeCondition,
     take: limit,
     skip: offset,
     distinct: "id",

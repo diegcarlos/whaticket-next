@@ -74,7 +74,7 @@ const TransferTicketModal = ({
     const delayDebounceFn = setTimeout(() => {
       const fetchUsers = async () => {
         try {
-          const { data } = await api.get("/users/", {
+          const { data } = await api.get("/users", {
             params: { searchParam },
           });
           setOptions(data.users);
@@ -214,7 +214,7 @@ const TransferTicketModal = ({
                       "transferTicketModal.fieldConnectionPlaceholder"
                     )}
                   >
-                    {whatsApps?.map((whasapp) => (
+                    {whatsApps?.map((whasapp: any) => (
                       <MenuItem key={whasapp.id} value={whasapp.id}>
                         {whasapp.name}
                       </MenuItem>

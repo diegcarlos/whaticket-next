@@ -5,6 +5,7 @@ import { PrismaClient, tickets as Ticket } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const ShowTicketService = async (id: number): Promise<Ticket> => {
+  console.log(id);
   const ticket = await prisma.tickets.findUnique({
     where: { id: Number(id) },
     include: {

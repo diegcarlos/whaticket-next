@@ -23,7 +23,6 @@
 // export default messageRoutes;
 
 import { FastifyInstance } from "fastify";
-import { upload } from "../config/upload";
 import * as MessageController from "../controllers/MessageController";
 import isAuth from "../middleware/isAuth";
 
@@ -37,11 +36,10 @@ const messageRoutes = async function (fastify: FastifyInstance, opts: any) {
 
   fastify.route({
     method: "POST",
-    url: "/messages/:messageId",
+    url: "/messages/:ticketId",
     handler: async (req, reply) => {
-      const fileObject = await req.saveRequestFiles();
-
-      await upload(fileObject);
+      // const fileObject = await req.saveRequestFiles();
+      // await upload(fileObject);
       MessageController.store(req, reply);
     },
     preHandler: isAuth,

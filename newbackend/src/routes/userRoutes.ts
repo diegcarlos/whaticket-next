@@ -19,21 +19,21 @@ const userRoutes = async function (fastify: FastifyInstance, opts: any) {
 
   fastify.route({
     method: "GET",
-    url: "/users/:usersId",
+    url: "/users/:userId",
     handler: UserController.show,
     preHandler: isAuth,
   });
 
   fastify.route({
     method: "PUT",
-    url: "/users/:usersId",
+    url: "/users/:userId",
     handler: UserController.update,
     preHandler: isAuth,
   });
 
   fastify.route({
     method: "DELETE",
-    url: "/users/:usersId",
+    url: "/users/:userId",
     handler: UserController.remove,
     preHandler: isAuth,
   });

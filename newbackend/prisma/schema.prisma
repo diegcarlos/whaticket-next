@@ -137,7 +137,7 @@ model users {
   tokenVersion Int        @default(0)
   whatsappId   Int?
   tickets      tickets[]
-  queues       queues[]
+  queues       queues[]   @relation(fields: [id], references: [usersId])
   whatsapps    whatsapps? @relation(fields: [whatsappId], references: [id], map: "Users_whatsappId_foreign_idx")
 
   @@index([whatsappId], map: "Users_whatsappId_foreign_idx")

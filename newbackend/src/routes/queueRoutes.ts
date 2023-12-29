@@ -1,18 +1,42 @@
-import { Router } from "express";
+import { FastifyInstance } from "fastify";
+import * as QueueController from "../controllers/QueueController";
 import isAuth from "../middleware/isAuth";
 
-import * as QueueController from "../controllers/QueueController";
+const queueRoutes = async function (fastify: FastifyInstance, opts: any) {
+  fastify.route({
+    method: "GET",
+    url: "/queue",
+    handler: QueueController.index,
+    preHandler: isAuth,
+  });
 
-const queueRoutes = Router();
+  fastify.route({
+    method: "POST",
+    url: "/queue",
+    handler: QueueController.store,
+    preHandler: isAuth,
+  });
 
-queueRoutes.get("/queue", isAuth, QueueController.index);
+  fastify.route({
+    method: "GET",
+    url: "/queue/:queueId",
+    handler: QueueController.show,
+    preHandler: isAuth,
+  });
 
-queueRoutes.post("/queue", isAuth, QueueController.store);
+  fastify.route({
+    method: "PUT",
+    url: "/queue/:queueId",
+    handler: QueueController.update,
+    preHandler: isAuth,
+  });
 
-queueRoutes.get("/queue/:queueId", isAuth, QueueController.show);
-
-queueRoutes.put("/queue/:queueId", isAuth, QueueController.update);
-
-queueRoutes.delete("/queue/:queueId", isAuth, QueueController.remove);
+  fastify.route({
+    method: "DELETE",
+    url: "/queue/:queueId",
+    handler: QueueController.remove,
+    preHandler: isAuth,
+  });
+};
 
 export default queueRoutes;

@@ -1,5 +1,6 @@
 import app from "./app";
-import { initIO } from "./libs/socket";
+import { getIO, initIO } from "./libs/socket";
+import { StartAllWhatsAppsSessions } from "./services/WbotServices/StartAllWhatsAppsSessions";
 import { logger } from "./util/logger";
 
 try {
@@ -10,3 +11,5 @@ try {
   process.exit(1);
 }
 initIO(app.server);
+StartAllWhatsAppsSessions();
+getIO();

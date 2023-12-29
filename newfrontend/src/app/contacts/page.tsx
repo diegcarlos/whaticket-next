@@ -111,7 +111,7 @@ const Contacts = () => {
     const delayDebounceFn = setTimeout(() => {
       const fetchContacts = async () => {
         try {
-          const { data } = await api.get("/contacts/", {
+          const { data } = await api.get("/contacts", {
             params: { searchParam, pageNumber },
           });
           dispatch({ type: "LOAD_CONTACTS", payload: data.contacts });

@@ -29,7 +29,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { queueId }: any = req.params;
 
-  const queue = await ShowQueueService(queueId);
+  const queue = await ShowQueueService(Number(queueId));
 
   return res.send(queue);
 };
@@ -41,7 +41,7 @@ export const update = async (
   const { queueId }: any = req.params;
   const { body }: any = req;
 
-  const queue = await UpdateQueueService(queueId, body);
+  const queue = await UpdateQueueService(Number(queueId), body);
 
   const io = getIO();
   io.emit("queue", {
@@ -58,7 +58,7 @@ export const remove = async (
 ): Promise<Response> => {
   const { queueId }: any = req.params;
 
-  await DeleteQueueService(queueId);
+  await DeleteQueueService(Number(queueId));
 
   const io = getIO();
   io.emit("queue", {

@@ -1,15 +1,20 @@
-import { Router } from "express";
+import { FastifyInstance } from "fastify";
+import * as SettingController from "../controllers/SettingController";
 import isAuth from "../middleware/isAuth";
 
-import * as SettingController from "../controllers/SettingController";
-
-const settingRoutes = Router();
-
-settingRoutes.get("/settings", isAuth, SettingController.index);
-
-// routes.get("/settings/:settingKey", isAuth, SettingsController.show);
-
-// change setting key to key in future
-settingRoutes.put("/settings/:settingKey", isAuth, SettingController.update);
+const settingRoutes = async function (fastify: FastifyInstance, opts: any) {
+  fastify.route({
+    method: "GET",
+    url: "/settings",
+    handler: SettingController.index,
+    preHandler: isAuth,
+  });
+  fastify.route({
+    method: "PUT",
+    url: "/settings/:settingKey",
+    handler: SettingController.update,
+    preHandler: isAuth,
+  });
+};
 
 export default settingRoutes;

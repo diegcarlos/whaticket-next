@@ -1,4 +1,4 @@
-import { tickets as Ticket } from "@prisma/client";
+import { PrismaClient, tickets as Ticket } from "@prisma/client";
 import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../../libs/socket";
@@ -22,13 +22,15 @@ interface Response {
   oldUserId: number | undefined;
 }
 
+const prisma = new PrismaClient();
+
 const UpdateTicketService = async ({
   ticketData,
   ticketId,
 }: Request): Promise<Response> => {
   const { status, userId, queueId, whatsappId } = ticketData;
 
-  const ticket = (await ShowTicketService(ticketId)) as any;
+  const ticket: any = await ShowTicketService(ticketId);
   await SetTicketMessagesAsRead(ticket);
 
   if (whatsappId && ticket.whatsappId !== whatsappId) {
@@ -42,38 +44,46 @@ const UpdateTicketService = async ({
     await CheckContactOpenTickets(ticket.contact.id, ticket.whatsappId);
   }
 
-  await ticket.update({
-    status,
-    queueId,
-    userId,
+  await prisma.tickets.update({
+    where: { id: ticket.id },
+    data: {
+      status,
+      queueId,
+      userId,
+    },
   });
 
   if (whatsappId) {
-    await ticket.update({
-      whatsappId,
+    await prisma.tickets.update({
+      where: { id: ticket.id },
+      data: {
+        whatsappId,
+      },
     });
   }
-
-  await ticket.reload();
+  const reloadTicket: any = await ShowTicketService(ticket.id);
 
   const io = getIO();
 
-  if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
+  if (
+    reloadTicket.status !== oldStatus ||
+    reloadTicket.user?.id !== oldUserId
+  ) {
     io.to(oldStatus).emit("ticket", {
       action: "delete",
-      ticketId: ticket.id,
+      ticketId: reloadTicket.id,
     });
   }
 
-  io.to(ticket.status)
+  io.to(reloadTicket.status)
     .to("notification")
     .to(ticketId.toString())
     .emit("ticket", {
       action: "update",
-      ticket,
+      ticket: reloadTicket,
     });
 
-  return { ticket, oldStatus, oldUserId };
+  return { ticket: reloadTicket, oldStatus, oldUserId };
 };
 
 export default UpdateTicketService;

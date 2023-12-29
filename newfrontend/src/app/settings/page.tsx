@@ -85,8 +85,9 @@ const Settings = () => {
   };
 
   const getSettingValue = (key: any) => {
-    const { value } = settings.find((s: any) => s.key === key);
-    return value;
+    console.log(key, settings);
+    const find = settings.find((s: any) => s.key === key);
+    return find?.value;
   };
 
   return (

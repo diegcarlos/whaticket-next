@@ -325,7 +325,7 @@ const MessageInput = ({ ticketStatus, ticketId }: any) => {
   const handleLoadQuickAnswer = async (value: any) => {
     if (value && value.indexOf("/") === 0) {
       try {
-        const { data } = await api.get("/quickAnswers/", {
+        const { data } = await api.get("/quickAnswers", {
           params: { searchParam: inputMessage.substring(1) },
         });
         setQuickAnswer(data.quickAnswers);

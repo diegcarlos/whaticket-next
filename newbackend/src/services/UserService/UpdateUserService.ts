@@ -2,8 +2,10 @@ import * as Yup from "yup";
 
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { difference } from "lodash";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
+import { logger } from "../../util/logger";
 import ShowUserService from "./ShowUserService";
 
 interface UserData {
@@ -74,10 +76,20 @@ const UpdateUserService = async ({
     },
   });
 
-  await prisma.userqueues.updateMany({
-    where: { userId: user.id },
-    data: queueIds,
-  });
+  if (queueIds.length > 0) {
+    const userQueues = await prisma.userqueues.findMany({ where: { userId } });
+    const exitsQueueId = userQueues.map((q) => q.queueId);
+    const resQueueCompare = difference(queueIds, exitsQueueId);
+
+    logger.warn(resQueueCompare);
+
+    // await prisma.userqueues.upsert({
+    //   where: { userId_queueId: { userId: user.id, queueId:  } },
+    //   data: queueIds.map((q) => {
+    //     return { userId: user.id, queueId: q };
+    //   }),
+    // });
+  }
 
   const reloadUser = await prisma.users.findUnique({
     where: { id: user.id },

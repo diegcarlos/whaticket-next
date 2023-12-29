@@ -19,21 +19,21 @@ const ticketRoutes = async function (fastify: FastifyInstance, opts: any) {
 
   fastify.route({
     method: "GET",
-    url: "/tickets/:ticketsId",
+    url: "/tickets/:ticketId",
     handler: TicketController.show,
     preHandler: isAuth,
   });
 
   fastify.route({
     method: "PUT",
-    url: "/tickets/:ticketsId",
+    url: "/tickets/:ticketId",
     handler: TicketController.update,
     preHandler: isAuth,
   });
 
   fastify.route({
     method: "DELETE",
-    url: "/tickets/:ticketsId",
+    url: "/tickets/:ticketId",
     handler: TicketController.remove,
     preHandler: isAuth,
   });

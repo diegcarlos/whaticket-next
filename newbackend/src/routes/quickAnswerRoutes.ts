@@ -1,30 +1,42 @@
-import express from "express";
+import { FastifyInstance } from "fastify";
+import * as QuickAnswerController from "../controllers/QuickAnswerController";
 import isAuth from "../middleware/isAuth";
 
-import * as QuickAnswerController from "../controllers/QuickAnswerController";
+const quickAnswerRoutes = async function (fastify: FastifyInstance, opts: any) {
+  fastify.route({
+    method: "GET",
+    url: "/quickAnswers",
+    handler: QuickAnswerController.index,
+    preHandler: isAuth,
+  });
 
-const quickAnswerRoutes = express.Router();
+  fastify.route({
+    method: "POST",
+    url: "/quickAnswers",
+    handler: QuickAnswerController.store,
+    preHandler: isAuth,
+  });
 
-quickAnswerRoutes.get("/quickAnswers", isAuth, QuickAnswerController.index);
+  fastify.route({
+    method: "GET",
+    url: "/quickAnswers/:quickAnswerId",
+    handler: QuickAnswerController.show,
+    preHandler: isAuth,
+  });
 
-quickAnswerRoutes.get(
-  "/quickAnswers/:quickAnswerId",
-  isAuth,
-  QuickAnswerController.show
-);
+  fastify.route({
+    method: "PUT",
+    url: "/quickAnswers/:quickAnswerId",
+    handler: QuickAnswerController.update,
+    preHandler: isAuth,
+  });
 
-quickAnswerRoutes.post("/quickAnswers", isAuth, QuickAnswerController.store);
-
-quickAnswerRoutes.put(
-  "/quickAnswers/:quickAnswerId",
-  isAuth,
-  QuickAnswerController.update
-);
-
-quickAnswerRoutes.delete(
-  "/quickAnswers/:quickAnswerId",
-  isAuth,
-  QuickAnswerController.remove
-);
+  fastify.route({
+    method: "DELETE",
+    url: "/quickAnswers/:quickAnswerId",
+    handler: QuickAnswerController.remove,
+    preHandler: isAuth,
+  });
+};
 
 export default quickAnswerRoutes;

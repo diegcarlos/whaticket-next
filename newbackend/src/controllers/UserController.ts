@@ -68,7 +68,7 @@ export const show = async (
 ): Promise<Response> => {
   const { userId }: any = req.params;
 
-  const user = await ShowUserService(userId);
+  const user = await ShowUserService(Number(userId));
 
   return res.send(user);
 };
@@ -84,7 +84,7 @@ export const update = async (
   const { userId }: any = req.params;
   const userData = req.body;
 
-  const user = await UpdateUserService({ userData, userId });
+  const user = await UpdateUserService({ userData, userId: Number(userId) });
 
   const io = getIO();
   io.emit("user", {
@@ -105,7 +105,7 @@ export const remove = async (
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
-  await DeleteUserService(userId);
+  await DeleteUserService(Number(userId));
 
   const io = getIO();
   io.emit("user", {

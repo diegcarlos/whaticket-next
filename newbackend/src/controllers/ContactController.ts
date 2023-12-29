@@ -107,7 +107,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { contactId }: any = req.params;
 
-  const contact = await ShowContactService(contactId);
+  const contact = await ShowContactService(Number(contactId));
 
   return res.send(contact);
 };
@@ -136,7 +136,10 @@ export const update = async (
 
   const { contactId }: any = req.params;
 
-  const contact = await UpdateContactService({ contactData, contactId });
+  const contact = await UpdateContactService({
+    contactData,
+    contactId: Number(contactId),
+  });
 
   const io = getIO();
   io.emit("contact", {
@@ -153,7 +156,7 @@ export const remove = async (
 ): Promise<Response> => {
   const { contactId }: any = req.params;
 
-  await DeleteContactService(contactId);
+  await DeleteContactService(Number(contactId));
 
   const io = getIO();
   io.emit("contact", {

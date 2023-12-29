@@ -7,8 +7,9 @@ import ListSettingsService from "../services/SettingServices/ListSettingsService
 import UpdateSettingService from "../services/SettingServices/UpdateSettingService";
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { body }: any = req;
-  if (body.user.profile !== "admin") {
+  //@ts-ignore
+  const { profile }: any = req.user;
+  if (profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
 
@@ -21,8 +22,8 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { body }: any = req;
-  if (body.user.profile !== "admin") {
+  const { profile }: any = req;
+  if (profile !== "admin") {
     throw new AppError("ERR_NO_PERMISSION", 403);
   }
   const { settingKey: key }: any = req.params;

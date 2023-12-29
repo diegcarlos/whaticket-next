@@ -89,8 +89,7 @@ const Ticket = ({ ticketId }: any) => {
       const fetchTicket = async () => {
         try {
           const { data } = await api.get("/tickets/" + ticketId);
-
-          setContact(data.contact);
+          setContact(data.contacts);
           setTicket(data);
           setLoading(false);
         } catch (err) {
@@ -155,7 +154,7 @@ const Ticket = ({ ticketId }: any) => {
         <TicketHeader loading={loading}>
           <div className={classes.ticketInfo}>
             <TicketInfo
-              contact={contact}
+              contacts={contact}
               ticket={ticket}
               onClick={handleDrawerOpen}
             />

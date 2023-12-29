@@ -195,7 +195,7 @@ const TicketListItem = ({ ticket, ticketId, onTicketSelect }: Props) => {
                 color="textPrimary"
               >
                 <div style={{ display: "flex", gap: 15, width: "100%" }}>
-                  <span>{ticket.contact.name}</span>
+                  <span>{ticket.contacts.name}</span>
                   <Badge
                     className={classes.newMessagesCount}
                     badgeContent={ticket.unreadMessages}

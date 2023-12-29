@@ -28,7 +28,7 @@ interface TicketData {
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { body }: any = req;
+  const { user }: any = req;
   const {
     pageNumber,
     status,
@@ -39,7 +39,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     withUnreadMessages,
   }: any = req.query as IndexQuery;
 
-  const userId = body.user.id;
+  const userId = user.id;
 
   let queueIds: number[] = [];
 
@@ -78,7 +78,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId }: any = req.params;
 
-  const contact = await ShowTicketService(ticketId);
+  const contact = await ShowTicketService(Number(ticketId));
 
   return res.code(200).send(contact);
 };
@@ -92,7 +92,7 @@ export const update = async (
 
   const { ticket } = (await UpdateTicketService({
     ticketData,
-    ticketId,
+    ticketId: Number(ticketId),
   })) as any;
 
   if (ticket.status === "closed") {
@@ -117,7 +117,7 @@ export const remove = async (
 ): Promise<Response> => {
   const { ticketId }: any = req.params;
 
-  const ticket = await DeleteTicketService(ticketId);
+  const ticket = await DeleteTicketService(Number(ticketId));
 
   const io = getIO();
   io.to(ticket.status).to(ticketId).to("notification").emit("ticket", {

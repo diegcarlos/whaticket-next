@@ -3,6 +3,9 @@ import { FastifyInstance } from "fastify/types/instance";
 import authRoutes from "./authRoutes";
 import contactRoutes from "./contactRoutes";
 import messageRoutes from "./messageRoutes";
+import queueRoutes from "./queueRoutes";
+import quickAnswerRoutes from "./quickAnswerRoutes";
+import settingRoutes from "./settingRoutes";
 import ticketRoutes from "./ticketRoutes";
 import userRoutes from "./userRoutes";
 import whatsAppRoutes from "./whatsAppRoutes";
@@ -16,6 +19,9 @@ const routes = async (f: FastifyInstance, opts: any) => {
   f.register(ticketRoutes);
   f.register(contactRoutes);
   f.register(messageRoutes);
+  f.register(queueRoutes);
+  f.register(quickAnswerRoutes);
+  f.register(settingRoutes);
 };
 
 export default fp(routes);

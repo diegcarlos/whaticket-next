@@ -2,10 +2,8 @@ import * as Yup from "yup";
 
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
-import { difference } from "lodash";
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
-import { logger } from "../../util/logger";
 import ShowUserService from "./ShowUserService";
 
 interface UserData {
@@ -77,11 +75,27 @@ const UpdateUserService = async ({
   });
 
   if (queueIds.length > 0) {
-    const userQueues = await prisma.userqueues.findMany({ where: { userId } });
-    const exitsQueueId = userQueues.map((q) => q.queueId);
-    const resQueueCompare = difference(queueIds, exitsQueueId);
+    // const userQueues = await prisma.userqueues.findMany({ where: { userId } });
+    // const exitsQueueId = userQueues.map((q) => q.queueId);
+    // const newQue = difference(queueIds, exitsQueueId);
+    // const delQue = difference(exitsQueueId, queueIds);
 
-    logger.warn(resQueueCompare);
+    // logger.warn(`new ${newQue}`);
+    // logger.warn(`del ${delQue}`);
+
+    // await prisma.users.update({
+    //   where: { id: userId },
+    //   data: { queues: { set: { idGroupQueue: { in: queueIds } } } },
+    // });
+
+    await prisma.users.update({
+      where: { id: userId },
+      data: {
+        queues: {
+          connect: { idGroupQueue: { in: queueIds } },
+        },
+      },
+    });
 
     // await prisma.userqueues.upsert({
     //   where: { userId_queueId: { userId: user.id, queueId:  } },

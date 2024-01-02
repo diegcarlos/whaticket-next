@@ -33,7 +33,7 @@ const AuthUserService = async (props: Request): Promise<Response> => {
   const prisma = new PrismaClient();
 
   const user = await prisma.users.findUnique({ where: { email } });
-  const queues = await prisma.queues.findMany();
+  const queues = await prisma.queues.findMany({ include: { whatsapps: true } });
 
   if (!user) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);

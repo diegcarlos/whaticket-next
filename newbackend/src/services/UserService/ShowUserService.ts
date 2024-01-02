@@ -24,8 +24,11 @@ const ShowUserService = async (id: number): Promise<UserReturn> => {
       tokenVersion: true,
       whatsappId: true,
       queues: {
-        select: { id: true, name: true, color: true },
-        orderBy: { name: "asc" },
+        include: {
+          queues: {
+            select: { id: true, name: true, color: true },
+          },
+        },
       },
       whatsapps: { select: { id: true, name: true } },
     },

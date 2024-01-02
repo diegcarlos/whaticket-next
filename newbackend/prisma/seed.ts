@@ -7,19 +7,19 @@ async function main() {
   await prisma.settings.upsert({
     where: { key: "userApiToken" },
     update: {},
-    create: { key: "userApiToken", value: uuid() }
+    create: { key: "userApiToken", value: uuid() },
   });
   await prisma.users.createMany({
     data: [
       {
         name: "Administrador",
-        email: "admin@whaticket.com",
+        email: "admin@admin.com",
         passwordHash:
           "$2a$08$WaEmpmFDD/XkDqorkpQ42eUZozOqRCPkPcTkmHHMyuTGUOkI8dHsq",
         profile: "admin",
-        tokenVersion: 0
-      }
-    ]
+        tokenVersion: 0,
+      },
+    ],
   });
 }
 
@@ -27,7 +27,7 @@ main()
   .then(async () => {
     await prisma.$disconnect();
   })
-  .catch(async e => {
+  .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
     process.exit(1);

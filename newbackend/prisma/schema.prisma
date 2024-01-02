@@ -58,20 +58,16 @@ model messages {
 }
 
 model queues {
-  id              Int        @id @default(autoincrement())
-  name            String     @unique(map: "name") @db.VarChar(255)
-  color           String     @unique(map: "color") @db.VarChar(255)
-  greetingMessage String?    @db.Text
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  idGroupQueue    Int?       @default(0)
+  id              Int              @id @default(autoincrement())
+  name            String           @unique(map: "name") @db.VarChar(255)
+  color           String           @unique(map: "color") @db.VarChar(255)
+  greetingMessage String?          @db.Text
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  idGroupQueue    Int?             @default(0)
   tickets         tickets[]
-  whatsapps       whatsapps? @relation(fields: [whatsappsId], references: [id])
-  whatsappsId     Int?
-  users           users?     @relation(fields: [usersId], references: [id])
-  usersId         Int?
-
-  @@index([idGroupQueue], map: "queues_idGroupQueue_fkey")
+  userqueues      userqueues[]
+  whatsapps       whatsappqueues[]
 }
 
 model quickanswers {
@@ -120,25 +116,28 @@ model tickets {
 model userqueues {
   userId    Int
   queueId   Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  queues    queues    @relation(fields: [queueId], references: [id], map: "Queues_queueId_foreign_idx")
+  user      users     @relation(fields: [userId], references: [id], map: "Users_userId_foreign_idx")
 
   @@id([userId, queueId])
+  @@index([userId], map: "userqueues_userId_fkey")
 }
 
 model users {
-  id           Int        @id @default(autoincrement())
-  name         String     @db.VarChar(255)
-  email        String     @unique(map: "email") @db.VarChar(255)
-  passwordHash String     @db.VarChar(255)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  profile      String     @default("admin") @db.VarChar(255)
-  tokenVersion Int        @default(0)
+  id           Int          @id @default(autoincrement())
+  name         String       @db.VarChar(255)
+  email        String       @unique(map: "email") @db.VarChar(255)
+  passwordHash String       @db.VarChar(255)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  profile      String       @default("admin") @db.VarChar(255)
+  tokenVersion Int          @default(0)
   whatsappId   Int?
   tickets      tickets[]
-  queues       queues[]   @relation(fields: [id], references: [usersId])
-  whatsapps    whatsapps? @relation(fields: [whatsappId], references: [id], map: "Users_whatsappId_foreign_idx")
+  whatsapps    whatsapps?   @relation(fields: [whatsappId], references: [id], map: "Users_whatsappId_foreign_idx")
+  queues       userqueues[]
 
   @@index([whatsappId], map: "Users_whatsappId_foreign_idx")
 }
@@ -146,32 +145,35 @@ model users {
 model whatsappqueues {
   whatsappId Int
   queueId    Int
-  createdAt  DateTime @db.DateTime(0)
-  updatedAt  DateTime @db.DateTime(0)
+  createdAt  DateTime   @db.DateTime(0)
+  updatedAt  DateTime   @db.DateTime(0)
+  queues     queues?    @relation(fields: [queuesId], references: [id])
+  whatsapps  whatsapps? @relation(fields: [whatsappId], references: [id])
+  queuesId   Int?
 
   @@id([whatsappId, queueId])
 }
 
 model whatsapps {
-  id              Int       @id @default(autoincrement())
-  session         String?   @db.Text
-  qrcode          String?   @db.Text
-  status          String?   @db.VarChar(255)
+  id              Int              @id @default(autoincrement())
+  session         String?          @db.Text
+  qrcode          String?          @db.Text
+  status          String?          @db.VarChar(255)
   battery         Int?
   plugged         Boolean?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  name            String    @unique(map: "name") @db.VarChar(255)
-  isDefault       Boolean   @default(false)
-  retries         Int       @default(0)
-  greetingMessage String?   @db.Text
-  farewellMessage String?   @db.Text
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  name            String           @unique(map: "name") @db.VarChar(255)
+  isDefault       Boolean          @default(false)
+  retries         Int              @default(0)
+  greetingMessage String?          @db.Text
+  farewellMessage String?          @db.Text
   tickets         tickets[]
   users           users[]
-  queues          queues[]
+  whatsappqueues  whatsappqueues[]
 }
 
-model groupqueue {
+model groupQueue {
   id          Int      @id @default(autoincrement())
   description String   @db.Text
   main        Boolean

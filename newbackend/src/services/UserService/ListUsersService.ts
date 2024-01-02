@@ -34,7 +34,7 @@ const ListUsersService = async ({
       email: true,
       profile: true,
       createdAt: true,
-      queues: { select: { id: true, name: true, color: true } },
+      queues: { include: { queues: true } },
       whatsapps: { select: { id: true, name: true } },
     },
     take: limit,

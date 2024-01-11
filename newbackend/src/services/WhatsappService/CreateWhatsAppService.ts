@@ -74,10 +74,20 @@ const CreateWhatsAppService = async ({
     throw new AppError("ERR_WAPP_GREETING_REQUIRED");
   }
 
-  const whatsapp = await prisma.whatsapps.create({
+  let whatsapp: any = await prisma.whatsapps.create({
     data: { name, status, greetingMessage, farewellMessage, isDefault },
-    include: { queues: true },
+    include: { whatsappqueues: { include: { queues: true } } },
   });
+
+  whatsapp = {
+    ...whatsapp,
+    queues: {
+      ...whatsapp.whatsappqueues.map((w: any) => {
+        return { ...w.queues };
+      }),
+    },
+  };
+  delete whatsapp["whatsappqueues"];
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
 

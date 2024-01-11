@@ -9,8 +9,11 @@ const AssociateWhatsappQueue = async (
   await prisma.whatsapps.update({
     where: { id: whatsapp.id },
     data: {
-      queues: {
-        connect: queueIds.map((id) => ({ id })),
+      whatsappqueues: {
+        updateMany: {
+          data: queueIds.map((id) => ({ id })),
+          where: { whatsappId: whatsapp.id },
+        },
       },
     },
   });

@@ -69,7 +69,7 @@ const CreateUserService = async ({
       profile,
       whatsappId: whatsappId ? whatsappId : null,
     },
-    include: { queues: true, whatsapps: true },
+    include: { userqueues: true, whatsapps: true },
   });
 
   await prisma.userqueues.createMany({
@@ -80,7 +80,7 @@ const CreateUserService = async ({
 
   const reloadUser = await prisma.users.findUnique({
     where: { id: user.id },
-    include: { queues: true, whatsapps: true },
+    include: { userqueues: true, whatsapps: true },
   });
 
   return SerializeUser(reloadUser as any);
